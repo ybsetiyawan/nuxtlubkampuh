@@ -14,7 +14,9 @@
       :loading="loading"
       :no-data-text="noDataText"
       @update:options="handleUpdate"
+      @click:row="handleRowClick"
     >
+    
     <template v-slot:[`item.no`]="{ item, index }">
       {{ (tableMeta.currentPage - 1) * tableMeta.limitPerPage + index + 1 }}.
     </template>
@@ -58,7 +60,7 @@
   <script>
   export default {
     name: 'DataTable',
-    emits: ['add-item'],
+    emits: ['add-item', 'edit-item'],
     props: {
       headers: {
         type: Array,
@@ -169,6 +171,9 @@
       this.filter.q = '';
       this.filter.pageNumber = 1;
       this.loadData();
+    },
+    handleRowClick(item) {
+      this.$emit('edit-item', item);
     }
 
 

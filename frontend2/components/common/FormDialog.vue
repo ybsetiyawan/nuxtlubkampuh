@@ -46,16 +46,35 @@
   
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="close">Batal</v-btn>
-          <v-btn 
-            color="blue darken-1" 
+          <!-- <v-btn 
+            v-if="isEditMode" 
+            color="red darken-1" 
             text 
-            @click="save"
+            @click="deleteItem"
             :loading="loading"
             :disabled="loading"
+            >
+            Hapus
+          </v-btn> -->
+          <v-btn color="blue darken-1" text @click="close" outlined>Batal</v-btn>
+          <v-btn 
+          color="blue darken-1" 
+          text 
+          @click="save"
+          :loading="loading"
+          :disabled="loading"
+          outlined
           >
-            Simpan
-          </v-btn>
+          Simpan
+        </v-btn>
+        <v-btn
+          v-if="isEditMode"
+          color="red darken-1"
+          text
+          outlined
+          @click="deleteItem"
+          :loading="loading"
+          :disabled="loading">Hapus</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -74,9 +93,17 @@
         type: Array,
         required: true
       },
+      initialData: {
+        type: Object,
+        default: () => ({})
+      },
       loading: {
         type: Boolean,
         default: false
+      },
+      isEditMode: { // Mode Edit
+      type: Boolean,
+      default: false
       }
     },
     data() {
@@ -95,6 +122,12 @@
       }
     },
     watch: {
+      initialData: {
+        immediate: true,
+        handler(newData) {
+          this.formData = { ...newData  }
+        }
+      },
       fields: {
         immediate: true,
         handler(fields) {
@@ -104,24 +137,41 @@
       }
     },
     methods: {
+
       initializeFormData(fields) {
-        const data = {}
+        const data = { ...this.formData, ...this.initialData } // Salin data yang ada
         fields.forEach(field => {
-          data[field.value] = ''
+          if (data[field.value] === undefined) {
+            data[field.value] = '' // Tambahkan field baru jika belum ada
+          }
         })
         this.formData = data
       },
+
+      // initializeFormData(fields) {
+      //   const data = {}
+      //   fields.forEach(field => {
+      //     data[field.value] = ''
+      //   })
+      //   this.formData = data
+      // },
       close() {
         this.dialog = false
         this.$emit('close')
         this.resetForm()
       },
       save() {
-        this.$emit('save', this.formData)
+        this.$emit('save', {...this.formData})
       },
       resetForm() {
         this.initializeFormData(this.fields)
+      },
+      deleteItem() {
+        this.$emit('delete', { ...this.formData });
+        this.dialog = false; // Tutup dialog setelah delete
       }
+
+
     }
   }
   </script>
