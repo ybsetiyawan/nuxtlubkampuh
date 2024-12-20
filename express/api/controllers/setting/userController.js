@@ -1,0 +1,145 @@
+const UserService = require("../../services/setting/userService");
+const jwt = require("jsonwebtoken");
+
+class UserController {
+  async resolveAllUsers(req, res) {
+    try {
+      const filters = {
+        pageSize: parseInt(req.query.pageSize) || 10,
+        pageNumber: parseInt(req.query.pageNumber) || 1,
+        idRole: req.query.idRole,
+        q: req.query.q,
+        sortBy: req.query.sortBy || "id",
+        sortType: req.query.sortType || "ASC",
+      };
+
+      const { users, totalItems } = await UserService.resolveAllUsers(filters);
+
+      const totalPage = Math.ceil(totalItems / filters.pageSize);
+      const currentPage = filters.pageNumber;
+      const previousPage = currentPage > 1 ? currentPage - 1 : null;
+      const nextPage = currentPage < totalPage ? currentPage + 1 : null;
+
+      const response = {
+        data: {
+          items: users.map((item) => ({
+            id: item.id,
+            user: item.user,
+            username: item.username,
+            idRole: item.id_role,
+            role: item.role,
+            kode: item.kode,
+          })),
+          meta: {
+            totalItems,
+            totalPage,
+            previousPage,
+            currentPage,
+            nextPage,
+            limitPerPage: filters.pageSize,
+          },
+        },
+      };
+
+      res.json(response);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async createUser(req, res) {
+    try {
+      const { nama, username, password, idRole } = req.body;
+
+      if (!username || !password) {
+        return res
+          .status(400)
+          .json({ message: "Username and password are required" });
+      }
+
+      const newUser = await UserService.createUser({
+        nama,
+        username,
+        password,
+        idRole,
+      });
+      res.status(201).json(newUser);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async login(req, res) {
+    try {
+      const { username, password } = req.body;
+
+      // Cari pengguna berdasarkan username
+      const user = await UserService.getUserByUsername(username);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Verifikasi password
+      const isPasswordValid = await UserService.verifyPassword(
+        password,
+        user.password
+      );
+      if (!isPasswordValid) {
+        return res.status(401).json({ message: "Invalid password" });
+      }
+
+      // Buat token JWT dengan payload tambahan
+      const token = jwt.sign(
+        {
+          userId: user.id,
+          roleId: user.role ? user.role.id : null,
+          nama: user.nama,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+      );
+
+      // Susun data respons seperti yang diminta
+      const response = {
+        data: {
+          token: {
+            AccessToken: token,
+          },
+          user: {
+            id: user.id,
+            username: user.username,
+            idRole: user.id_role ? user.id_role : null,
+            nama: user.user || null,
+            role: user.role
+              ? {
+                  id: user.id_role,
+                  name: user.role,
+                  kode: user.kode,
+                }
+              : null,
+          },
+        },
+      };
+
+      res.json(response);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async getUserByUsername(req, res) {
+    try {
+      const { username } = req.params;
+      const user = await UserService.getUserByUsername(username);
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+}
+
+module.exports = new UserController();
