@@ -104,7 +104,8 @@ class UserRepository {
 
   async getUserByUsername(username) {
     const res = await pool.query(
-      "SELECT u.id, u.nama as user, u.username, u.password, u.id_role, r.nama as role, r.kode FROM c_user u JOIN c_role r on r.id=u.id_role WHERE username = $1",
+      `SELECT u.id, u.nama as user, u.username, u.password, u.id_role, r.nama as role, r.kode
+      FROM c_user u JOIN c_role r on r.id=u.id_role WHERE username = $1 AND u.is_deleted = false`,
       [username]
     );
     return res.rows[0];
