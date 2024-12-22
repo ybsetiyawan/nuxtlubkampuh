@@ -144,10 +144,9 @@
         </v-list>
       </v-menu>
     </v-app-bar>
+
     <v-main>
-      <v-container 
-        fluid  
-      >
+      <v-container fluid class="pa-1">
         <Nuxt />
       </v-container>
     </v-main>

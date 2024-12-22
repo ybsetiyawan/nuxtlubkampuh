@@ -7,7 +7,7 @@
         <v-spacer/> -->
     <v-data-table class="table"
       :headers="headers"
-      :items="tableItems"s
+      :items="tableItems"
       :items-per-page="tableMeta.limitPerPage"
       :server-items-length="tableMeta.totalItems"
       :footer-props="footerProps"
@@ -69,7 +69,7 @@
       footerProps: {
         type: Object,
         default: () => ({
-          'items-per-page-options': [10, 20, 40, 50]
+          'items-per-page-options': [8, 16, 24, 32 ],
         })
       },
       title: {
@@ -205,7 +205,5 @@
   width: 100%;
   padding: 16px !important; /* Sesuaikan padding sesuai kebutuhan */
 }
-
-
 
 </style>

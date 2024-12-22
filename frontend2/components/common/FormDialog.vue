@@ -34,11 +34,12 @@
                 <v-select
                   v-else-if="field.type === 'select'"
                   v-model="formData[field.value]"
-                  :items="field.items"
+                  :items="field.options"
                   :label="field.text"
                   :rules="field.rules"
-                  :required="field.required"
+                  :required="field.required || false"
                 ></v-select>
+              
               </v-col>
             </v-row>
           </v-container>
@@ -46,16 +47,6 @@
   
         <v-card-actions>
           <v-spacer></v-spacer>
-          <!-- <v-btn 
-            v-if="isEditMode" 
-            color="red darken-1" 
-            text 
-            @click="deleteItem"
-            :loading="loading"
-            :disabled="loading"
-            >
-            Hapus
-          </v-btn> -->
           <v-btn color="blue darken-1" text @click="close" outlined>Batal</v-btn>
           <v-btn 
           color="blue darken-1" 

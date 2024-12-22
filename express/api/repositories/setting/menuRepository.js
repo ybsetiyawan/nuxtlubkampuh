@@ -23,6 +23,8 @@ class MenuRepository {
         WHERE is_deleted = false
     `;
 
+    
+
     // Menambahkan kondisi pencarian jika ada
     if (conditions.length > 0) {
       query += " AND " + conditions.join(" AND ");

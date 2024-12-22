@@ -22,10 +22,11 @@ class UserRepository {
     }
 
     let query = `
-      SELECT u.id, u.nama AS user, u.username, u.id_role, 
+      SELECT u.id, u.nama AS user, u.username, u.id_role, u.is_deleted,
              r.nama AS role, r.kode 
       FROM c_user u
       JOIN c_role r ON r.id = u.id_role
+      WHERE u.is_deleted = false
     `;
 
     if (conditions.length > 0) {
@@ -60,6 +61,7 @@ class UserRepository {
 
   async createUser(user) {
     // Generate UUID
+    // console.log('Data From BE :', user)
     const id = uuidv4();
 
     const res = await pool.query(
@@ -68,6 +70,37 @@ class UserRepository {
     );
     return res.rows[0];
   }
+
+  async updateUser(id, user) {
+    const res = await pool.query(
+      "UPDATE c_user SET nama = $1, username = $2, password =$3, id_role=$4, is_deleted=$5, updated_at = NOW() WHERE id = $6 RETURNING *",
+      [
+        user.nama,
+        user.username,
+        user.password,
+        user.idRole,
+        user.isDeleted,
+        id,
+      ]
+    );
+    return res.rows[0];
+  }
+
+  async DeleteUserStatus(id, data) {
+    const { isDeleted } = data;
+    const result = await pool.query(
+      `
+      UPDATE c_user
+      SET is_deleted = $1
+      WHERE id = $2
+      RETURNING *
+      `,
+      [isDeleted, id]
+    );
+
+    return result.rows[0];
+  }
+
 
   async getUserByUsername(username) {
     const res = await pool.query(

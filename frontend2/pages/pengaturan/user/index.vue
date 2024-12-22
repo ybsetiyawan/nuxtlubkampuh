@@ -4,12 +4,12 @@
       ref="dataTable"
       :headers="menuHeaders"
       :items="menuItems"
-      title="Data Menu"
-      searchTitle="Cari Menu"
+      title="Data User"
+      searchTitle="Cari User"
       :meta="meta"
       :fetch-data="fetchData"
       :transform-response="transformResponse"
-      default-sort-by="nama_menu"
+      default-sort-by="username"
       default-sort-type="ASC"
       @add-item="openAddDialog"
       @edit-item="handleEditItem"
@@ -34,6 +34,9 @@
         :rules="field.rules"
         :required="field.required"
       ></v-text-field>
+
+      
+
     </form-dialog>
   </div>
 </template>
@@ -53,50 +56,90 @@ export default {
       menuItems: [],
       menuHeaders: [
         { text: 'No', value: 'no', width: '68px', sortable: false },
-        { text: 'Nama Menu', value: 'namaMenu', sortable: false },
-        { text: 'Link Menu', value: 'linkMenu', sortable: false },
-        { text: 'Class Icon', value: 'classIcon', sortable: false },
-        { text: 'Keterangan', value: 'keterangan', sortable: false },
+        { text: 'Kode', value: 'kode', sortable: false },
+        { text: 'User', value: 'user', sortable: false }, 
+        { text: 'Username', value: 'username', sortable: false }, 
+        { text: 'Role', value: 'role', sortable: false },
       ],
       dialog: false,
-      dialogTitle: 'Tambah Menu Baru',
+      dialogTitle: 'Tambah User Baru',
       loading: false,
       formFields: [
+
         {
-          text: 'Nama Menu',
-          value: 'namaMenu',
+          text: 'User',
+          value: 'user',
           type: 'text',
           required: true,
           rules: [
-            (v) => !!v || 'Nama menu harus diisi',
-            (v) => v.length >= 3 || 'Nama menu minimal 3 karakter',
+            (v) => !!v || 'Nama harus diisi',
+            (v) => v.length >= 5 || 'Nama minimal 5 karakter',
           ],
         },
         {
-          text: 'Link Menu',
-          value: 'linkMenu',
+          text: 'Username',
+          value: 'username',
           type: 'text',
           required: true,
-          rules: [(v) => !!v || 'Link menu harus diisi'],
+          rules: [
+            (v) => !!v || 'Username harus diisi',
+            (v) => v.length >= 5 || 'Username minimal 5 karakter',
+          ],
         },
-        { text: 'Class Icon', value: 'classIcon', type: 'text' },
-        { text: 'Keterangan', value: 'keterangan', type: 'text' },
+        {
+          text: 'Password',
+          value: 'password',
+          type: 'text',
+          required: true,
+          rules: [
+            (v) => !!v || 'Password harus diisi',
+            (v) => v.length >= 8 || 'Password minimal 8 karakter',
+
+          ],
+        },
+        { 
+          text: 'Role',
+          value: 'role',
+          type: 'select',
+          options:[],
+          rules: [(v) => !!v || 'Rule harus dipilih']
+
+         },
       ],
       meta: {},
       edit: {
-        namaMenu: '',
-        linkMenu: '',
-        classIcon: '',
-        keterangan: '',
+        user: '',
+        username: '',
+        password: '',
+        role: '',
       },
       isEditMode: false, // Tambahkan ini
     };
   },
   methods: {
+    async fetchRole() {
+      try {
+      const response = await api.get('/api/roles');
+      const roles = response.data.data;
+      console.log('Role Data:', roles);
+      const roleOptions = roles.map((role) => ({
+        text: role.nama, // Ubah sesuai dengan nama field yang mewakili nama peran
+        value: role.id,  // Ubah sesuai dengan id atau kode unik peran
+      }));
+      const roleField = this.formFields.find((field) => field.value === 'role');
+        if (roleField) {
+        roleField.options = roleOptions;
+      }
+
+    } catch (error) {
+      console.error('Gagal mengambil data role:', error);
+      }
+    },
+
     async fetchData(filter) {
       const token = this.$cookies.get(this.$config.tokenKey);
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      return await api.get('/api/menu', {
+      return await api.get('/api/users', {
         headers: { Authorization: `Bearer ${token}` },
         params: filter,
       });
@@ -109,20 +152,21 @@ export default {
         const isEdit = this.edit.id;
 
         const payload = {
-          namaMenu: formData.namaMenu,
-          linkMenu: formData.linkMenu,
-          keterangan: formData.keterangan || null,
-          classIcon: formData.classIcon || null,
+          nama: formData.user,
+          username: formData.username,
+          password: formData.password,
+          idRole: formData.role,
           isDeleted: false,
         };
+        console.log('Data Add', payload);
 
         let apiCall;
         if (isEdit) {
-          apiCall = api.put(`/api/menu/${this.edit.id}`, payload, {
+          apiCall = api.put(`/api/users/${this.edit.id}`, payload, {
             headers: { Authorization: `Bearer ${token}` },
           });
         } else {
-          apiCall = api.post(`/api/menu`, payload, {
+          apiCall = api.post(`/api/users`, payload, {
             headers: { Authorization: `Bearer ${token}` },
           });
         }
@@ -170,7 +214,7 @@ export default {
 
         if (result.isConfirmed) {
           const token = this.$cookies.get(this.$config.tokenKey);
-          await api.delete(`/api/menu/${data.id}`, {
+          await api.delete(`/api/users/${data.id}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
 
@@ -184,6 +228,7 @@ export default {
           });
         }
         } catch (error) {
+        console.error('Error Delete data:', error);
         this.$toast.fire({
         icon: 'error',
         title: error.response?.data?.message || 'Gagal menghapus data',
@@ -201,12 +246,14 @@ export default {
     openAddDialog() {
       this.isEditMode = false; // Atur ke mode tambah
       this.edit = {
-        namaMenu: '',
-        linkMenu: '',
-        classIcon: '',
-        keterangan: '',
+        user:'',
+        username: '',
+        password: '',
+        // role: '',
+        // keterangan: '',
       };
       this.dialog = true;
+      this.fetchRole();
     },
 
     closeDialog() {
@@ -218,12 +265,13 @@ export default {
       this.dialogTitle = 'Edit Menu';
       this.edit = {
         id: item.id,
-        namaMenu: item.namaMenu || '',
-        linkMenu: item.linkMenu || '',
-        classIcon: item.classIcon || '',
-        keterangan: item.keterangan || '',
+        user: item.user || '',
+        username: item.username || '',
+        password: item.password || '',
+        id_role: item.role || '',
       };
       this.dialog = true;
+      this.fetchRole();
     },
   },
 };

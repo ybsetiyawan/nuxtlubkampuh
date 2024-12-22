@@ -47,14 +47,16 @@ class UserController {
     }
   }
 
+  
+
   async createUser(req, res) {
     try {
       const { nama, username, password, idRole } = req.body;
 
-      if (!username || !password) {
+      if (!nama || !username || !password || !idRole) {
         return res
           .status(400)
-          .json({ message: "Username and password are required" });
+          .json({ message: "Ada data yang belum dilengkapi" });
       }
 
       const newUser = await UserService.createUser({
@@ -66,6 +68,54 @@ class UserController {
       res.status(201).json(newUser);
     } catch (error) {
       res.status(500).json({ message: error.message });
+    }
+  }
+
+  async updateUser(req, res) {
+    try {
+      const { nama, username, password, idRole } = req.body;
+
+      if (!nama || !username || !password || !idRole) {
+        return res
+          .status(400)
+          .json({ message: "Ada data yang belum dilengkapi" });
+      }
+      const updatedUser = await UserService.updateUser(req.params.id, req.body);
+      res.json({
+        data: updatedUser,
+      });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async deleteUser(req, res) {
+    try {
+      const id = req.params.id;
+      const deletedUser = await UserService.deleteUser(id);
+
+      if (!deletedUser) {
+        return res.status(404).json({
+          data: {
+            message: "User tidak ditemukan",
+            success: false,
+          },
+        });
+      }
+
+      res.json({
+        data: {
+          message: "Data Berhasil di Hapus",
+          success: true,
+        },
+      });
+    } catch (error) {
+      res.status(500).json({
+        data: {
+          message: error.message,
+          success: false,
+        },
+      });
     }
   }
 
@@ -96,7 +146,7 @@ class UserController {
           nama: user.nama,
         },
         process.env.JWT_SECRET,
-        { expiresIn: "1h" }
+        { expiresIn: "10h" }
       );
 
       // Susun data respons seperti yang diminta
