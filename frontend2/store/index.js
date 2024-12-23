@@ -68,7 +68,7 @@ export const actions = {
   //token dan idRole disimpan di state Vuex.
   async login({ commit, dispatch }, { username, password }) {
     const response = await api.post('/api/users/login', { username, password });
-    console.log('Login Response:', response);
+    // console.log('Login Response:', response);
 
     const { token, user } = response.data.data;
     
@@ -82,14 +82,15 @@ export const actions = {
     commit('setNama', user.nama);
     this.$cookies.set('nama', user.nama);
 
-    console.log('ID Role:', user.idRole);
-    console.log('Access Token:', token.AccessToken);
+    // console.log('ID Role:', user.idRole);
+    // console.log('Access Token:', token.AccessToken);
 
     //setelah login berhasil dan menyimpan token dan idRole, maka fetch menu items.
     await dispatch('fetchMenuItems', token.AccessToken);
+    
 
-    console.log('Token:', token.AccessToken);
-    console.log('User:', user);
+    // console.log('Token:', token.AccessToken);
+    // console.log('User:', user);
   },
 
   async logout({ commit }) {

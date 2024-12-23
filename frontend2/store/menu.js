@@ -22,3 +22,4 @@ export const fetchMenuItems = async (idRole, token) => {
     throw error; // Lempar error agar bisa ditangani di tempat lain
   }
 };
+

@@ -74,17 +74,37 @@ class CustomerRepository {
     return res.rows[0];
   }
 
+    
+    
+  
+  
   async createCustomer(customer) {
+    const generateKode = async () => {
+      const result = await pool.query('SELECT kode FROM m_customer ORDER BY kode DESC LIMIT 1');
+      let kodeTerakhir = result.rows[0]?.kode;
+      
+      if (!kodeTerakhir) {
+        kodeTerakhir = 'A01';
+      } else {
+        const angka = parseInt(kodeTerakhir.substring(1));
+        kodeTerakhir = `A${String(angka + 1).padStart(2, '0')}`;
+      }
+      
+      return kodeTerakhir;
+    };
+    
+    
+
     // Generate UUID
     const id = uuidv4();
-
+    const kode = await generateKode();
     const res = await pool.query(
       "INSERT INTO m_customer (id, kode, nama, no_telp, alamat, email, npwp) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
       [
         id,
-        customer.kode,
+        kode,
         customer.nama,
-        customer.no_telp,
+        customer.noTelp,
         customer.alamat,
         customer.email,
         customer.npwp,
@@ -95,11 +115,11 @@ class CustomerRepository {
 
   async updateCustomer(id, customer) {
     const res = await pool.query(
-      "UPDATE m_customer SET kode = $1, nama = $2, no_telp =$3, alamat=$4, email=$5, npwp=$7, is_deleted=$8, updated_at = NOW() WHERE id = $9 RETURNING *",
+      "UPDATE m_customer SET kode = $1, nama = $2, no_telp =$3, alamat=$4, email=$5, npwp=$6, is_deleted=$7, updated_at = NOW() WHERE id = $8 RETURNING *",
       [
         customer.kode,
         customer.nama,
-        customer.no_telp,
+        customer.noTelp,
         customer.alamat,
         customer.email,
         customer.npwp,

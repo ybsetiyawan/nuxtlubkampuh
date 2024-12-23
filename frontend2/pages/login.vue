@@ -66,7 +66,7 @@ export default {
           username: this.username,
           password: this.password,
         });
-        this.$router.push('/');
+        this.$router.replace('/');
       } catch (error) {
         const errorMessage = error.response?.data?.message || 'Login failed: Unknown error';
         alert(errorMessage);

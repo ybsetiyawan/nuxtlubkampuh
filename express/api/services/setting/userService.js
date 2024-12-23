@@ -20,12 +20,12 @@ class UserService {
 
   
   async updateUser(id, userData) {
-  const saltRounds = 10;
-  if (userData.password) {
-    const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
-    userData.password = hashedPassword;
-  }
-  return await UserRepository.updateUser(id, userData);
+    const saltRounds = 10;
+    if (userData.password) {
+      const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
+      userData.password = hashedPassword;
+    }
+    return await UserRepository.updateUser(id, userData);
   }
 
   async deleteUser(id) {

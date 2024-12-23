@@ -7,7 +7,9 @@ const formatCustomer = (customer) => ({
   email: customer.email,
   npwp: customer.npwp,
   createdAt: customer.created_at,
+  createdBy: customer.created_by,
   updatedAt: customer.updated_at,
+  updatedBy: customer.updated_by,
   isDeleted: customer.is_deleted || false,
 });
 
