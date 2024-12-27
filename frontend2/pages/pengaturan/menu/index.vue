@@ -44,6 +44,10 @@ import DataTable from '@/components/common/DataTable.vue';
 import FormDialog from '~/components/common/FormDialog.vue';
 
 export default {
+  // middleware: 'auth',
+  //   meta: {
+  //     requiresRole: ['HA01'], // Hanya untuk admin
+  //   },
   components: {
     DataTable,
     FormDialog,

@@ -25,8 +25,18 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    { src: '~/plugins/sweetalert.js', mode: 'client' }
+    { src: '~/plugins/sweetalert.js', mode: 'client' },
+    { src: '~/plugins/loading.js', mode: 'client', ssr: false },
   ],
+
+  // router: {
+  //   middleware: ['auth']
+  // },
+
+  // middleware: 'auth',
+  // meta: {
+  //   requiresRole: ['HA01', 'HA02'], // Hanya untuk admin dan user
+  // },
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -36,6 +46,7 @@ export default {
     // https://go.nuxtjs.dev/vuetify
     '@nuxtjs/vuetify',
   ],
+  
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [

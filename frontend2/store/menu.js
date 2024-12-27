@@ -10,7 +10,7 @@ export const fetchMenuItems = async (idRole, token) => {
         Authorization: `Bearer ${token}`
       }
     });
-    console.log('Menu items fetched:', response.data.data);
+    // console.log('Menu items fetched:', response.data.data);
     return response.data.data; // Kembalikan data menu
   } catch (error) {
     console.error('Error fetching menu items:', error);

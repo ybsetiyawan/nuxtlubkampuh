@@ -11,7 +11,6 @@
       :items-per-page="tableMeta.limitPerPage"
       :server-items-length="tableMeta.totalItems"
       :footer-props="footerProps"
-      :loading="loading"
       :no-data-text="noDataText"
       @update:options="handleUpdate"
       @click:row="handleRowClick"
@@ -134,7 +133,8 @@
 
     async loadData() {
       try {
-        this.loading = true;
+        this.$root.$emit('start-loading'); // Tampilkan garis loading
+        // this.loading = true;
         // Kirim parameter search ke parent component
         // console.log('Searching with filter:', this.filter);
         const response = await this.fetchData(this.filter);
@@ -144,7 +144,8 @@
       } catch (error) {
         console.error('Error loading data:', error);
       } finally {
-        this.loading = false;
+        // this.loading = false;
+        this.$root.$emit('stop-loading'); // Sembunyikan garis loading
       }
     
     },

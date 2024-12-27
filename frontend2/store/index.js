@@ -2,24 +2,26 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import api from '@/service/api';
 import { fetchMenuItems } from './menu';
+import loading from '~/plugins/loading';
 
 Vue.use(Vuex);
 
 export const state = () => ({
   token: null,
-  user: null,
+  // user: null,
   idRole: null,
   // nama: null,
   items: [],
+  loading: false
 });
 
 export const mutations = {
   setToken(state, token) {
     state.token = token;
   },
-  setUser(state, user) {
-    state.user = user;
-  },
+  // setUser(state, user) {
+  //   state.user = user;
+  // },
   clearAuth(state) {
     state.token = null;
     state.user = null;
@@ -33,21 +35,25 @@ export const mutations = {
   setNama(state, nama) {
     state.nama = nama;
   },
+  setLoading(state, value) {
+    state.loading = value
+  }
 };
 
 export const getters = {
   isAuthenticated(state) {
     return !!state.token;
   },
-  getUser(state) {
-    return state.user;
-  },
+  // getUser(state) {
+  //   return state.user;
+  // },
   items(state) {
     return state.items;
   },
   idRole(state) {
     return state.idRole;
   },
+  
   // nama(state) {
   //   return state.nama;
   // },
@@ -67,10 +73,12 @@ export const actions = {
   //Pengguna melakukan login melalui action login di store/index.js. Setelah login berhasil,
   //token dan idRole disimpan di state Vuex.
   async login({ commit, dispatch }, { username, password }) {
+
+
     const response = await api.post('/api/users/login', { username, password });
     // console.log('Login Response:', response);
 
-    const { token, user } = response.data.data;
+    const { token, user, } = response.data.data;
     
     commit('setToken', token.AccessToken);
     this.$cookies.set(this.$config.tokenKey, token.AccessToken);
@@ -78,19 +86,9 @@ export const actions = {
     // commit('setUser', user);
     commit('setIdRole', user.idRole);
     this.$cookies.set('idRole', user.idRole);
-
-    commit('setNama', user.nama);
+    // commit('setNama', user.nama);
     this.$cookies.set('nama', user.nama);
-
-    // console.log('ID Role:', user.idRole);
-    // console.log('Access Token:', token.AccessToken);
-
-    //setelah login berhasil dan menyimpan token dan idRole, maka fetch menu items.
-    await dispatch('fetchMenuItems', token.AccessToken);
-    
-
-    // console.log('Token:', token.AccessToken);
-    // console.log('User:', user);
+    this.$cookies.set('kode', user.role.kode);
   },
 
   async logout({ commit }) {
@@ -98,39 +96,38 @@ export const actions = {
     this.$cookies.remove(this.$config.tokenKey)
     this.$cookies.remove('idRole');
     this.$cookies.remove('nama');
+    this.$cookies.remove('kode');
     this.$router.push('/login');
   },
 
-  
-  // async fetchMenuItems({ state, commit }) {
-  //   console.log('Fetching menu items for roleId:', state.idRole);
-  //   console.log('Using token:', state.token);
-  //   try {
-  //     const response = await api.get(`/api/menu-user?roleId=${state.idRole}`, {
-  //       headers: {
-  //         Authorization: `Bearer ${state.token}`
-  //       }
-  //     });
-  //     console.log('Menu items fetched:', response.data.data);
-  //     commit('setItems', response.data.data);
-  //   } catch (error) {
-  //     console.error('Error fetching menu items:', error);
-  //     if (error.response) {
-  //       console.error('Response data:', error.response.data);
-  //       console.error('Response status:', error.response.status);
-  //       console.error('Response headers:', error.response.headers);
-  //     }
-  //   }
-  // },
-
   async fetchMenuItems({ state, commit }) {
     try {
-      const items = await fetchMenuItems(state.idRole, state.token); // Panggil fungsi dari file baru
-      commit('setItems', items); // Simpan items ke state
+      const items = await fetchMenuItems(state.idRole, state.token);
+      commit('setItems', items);
+  
+      // if (items && items.length > 0) {
+      //   const links = [];
+      //   for (const item of items) {
+      //     if (item.link !== "#") {
+      //       links.push(item.link);
+      //     }
+      //     if (item.children) {
+      //       for (const child of item.children) {
+      //         if (child.link !== "#") {
+      //           links.push(child.link);
+      //         }
+      //       }
+      //     }
+      //   }
+      //   // commit('setLinks', JSON.stringify(links));
+      //   this.$cookies.set('links',links);
+
+
+      // }
+  
     } catch (error) {
       console.error('Failed to fetch menu items in store:', error);
-    }
-  },
-
+    }
+  }
   
 };

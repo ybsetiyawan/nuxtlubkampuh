@@ -47,6 +47,8 @@ import DataTable from '@/components/common/DataTable.vue';
 import FormDialog from '~/components/common/FormDialog.vue';
 
 export default {
+
+  
   components: {
     DataTable,
     FormDialog,

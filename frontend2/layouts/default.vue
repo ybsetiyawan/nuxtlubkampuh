@@ -1,5 +1,13 @@
 <template>
   <v-app dark>
+    <v-progress-linear
+      v-if="isLoading"
+      class="loading-bar" 
+      indeterminate
+      absolute
+      top
+      height="1"
+    ></v-progress-linear>
     <v-navigation-drawer
       v-model="drawer"
       :mini-variant="miniVariant"
@@ -7,8 +15,6 @@
       fixed
       app
     >
-
-    
 
     <v-list class="pa-0">
         <template v-for="(item, index) in items ">
@@ -164,7 +170,6 @@
 import { mapGetters, } from 'vuex';
 
 export default {
-
   middleware: 'auth',
   data() {
     return {
@@ -199,18 +204,33 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['items','isAuthenticated']),
+    ...mapGetters(['items','isAuthenticated', 'loading']),
 
 
     avatar() {
       return require(`~/assets/avatar/boy.png`);
     },
+
+    isLoading() {
+    return this.$store.state.loading;
+  },
     
   },
   mounted() {
     if (this.isAuthenticated) {
       this.fetchMenuItems(); // Panggil fetchMenuItems hanya jika sudah login
     }
+
+    this.$root.$on('start-loading', () => {
+    this.$store.commit('setLoading', true);
+    });
+    this.$root.$on('stop-loading', () => {
+    this.$store.commit('setLoading', false); 
+    });
+
+    // console.log('Mounted: Loading state:', this.$store.state.loading);
+
+   
   },
   methods: {
     async fetchMenuItems() {
@@ -224,14 +244,23 @@ export default {
     handleLogout() {
       this.$store.dispatch('logout');
     },
+    
 
    
-  }
+  },
 };
 </script>
 
-<style scoped>  
+<style scoped> 
+.v-progress-linear {
+  z-index: 9999 !important;
+  position: fixed;
+  top: 0;
+} 
 
+.loading-bar {
+  background-image: linear-gradient(to right, rgb(245, 7, 7), rgb(7, 143, 255));
+}
 </style>
 
 

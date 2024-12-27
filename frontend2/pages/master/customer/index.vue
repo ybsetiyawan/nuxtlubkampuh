@@ -44,6 +44,10 @@
   import FormDialog from '~/components/common/FormDialog.vue';
   
   export default {
+    // middleware: 'auth',
+    // meta: {
+    //   requiresRole: ['HA02'], // Hanya untuk admin
+    // },
     components: {
       DataTable,
       FormDialog,
