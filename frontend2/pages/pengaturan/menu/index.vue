@@ -14,6 +14,7 @@
       @add-item="openAddDialog"
       @edit-item="handleEditItem"
     />
+    <v-form ref="form">
     <form-dialog
       v-model="dialog"
       :title="dialogTitle"
@@ -35,6 +36,7 @@
         :required="field.required"
       ></v-text-field>
     </form-dialog>
+    </v-form>
   </div>
 </template>
 
@@ -107,47 +109,50 @@ export default {
     },
 
     async save(formData) {
+        if (!this.$refs.form.validate()) {
+          this.$toast.fire({
+            icon: 'error',
+            title: 'Form tidak valid, silahkan isi data dengan benar!',
+          });
+          return
+      }
       this.loading = true;
       try {
-        const token = this.$cookies.get(this.$config.tokenKey);
-        const isEdit = this.edit.id;
+      const token = this.$cookies.get(this.$config.tokenKey);
+      const isEdit = !!this.edit.id;
 
-        const payload = {
-          namaMenu: formData.namaMenu,
-          linkMenu: formData.linkMenu,
-          keterangan: formData.keterangan || null,
-          classIcon: formData.classIcon || null,
-          isDeleted: false,
-        };
-
-        let apiCall;
-        if (isEdit) {
-          apiCall = api.put(`/api/menu/${this.edit.id}`, payload, {
+      const payload = {
+        namaMenu: formData.namaMenu,
+        linkMenu: formData.linkMenu,
+        keterangan: formData.keterangan || null,
+        classIcon: formData.classIcon || null,
+        isDeleted: false,
+      };
+      const apiCall = isEdit
+        ? api.put(`/api/menu/${this.edit.id}`, payload, {
             headers: { Authorization: `Bearer ${token}` },
-          });
-        } else {
-          apiCall = api.post(`/api/menu`, payload, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-        }
-
-        await apiCall;
-        this.closeDialog();
-        if (this.$refs.dataTable) {
-          await this.$refs.dataTable.loadData();
-        }
-        this.$toast.fire({
-          icon: 'success',
-          title: isEdit
-            ? 'Data berhasil diperbarui'
-            : 'Data berhasil ditambahkan',
+          })
+        : api.post(`/api/menu`, payload, {
+          headers: { Authorization: `Bearer ${token}` },
         });
+
+      await apiCall;
+      this.closeDialog();
+      if (this.$refs.dataTable) {
+        await this.$refs.dataTable.loadData();
+      }
+      this.$toast.fire({
+        icon: 'success',
+        title: isEdit
+          ? 'Data berhasil diperbarui'
+          : 'Data berhasil ditambahkan',
+      });
       } catch (error) {
         console.error('Error Save data:', error);
         this.$toast.fire({
           icon: 'error',
           title:
-            error.response?.data?.message || 'Gagal menambahkan data',
+            error.response?.data?.message || 'Gagal menyimpan data',
         });
       } finally {
         this.loading = false;
