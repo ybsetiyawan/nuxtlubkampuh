@@ -10,7 +10,7 @@ const Toast = Swal.mixin({
   timerProgressBar: true,
   background: '#333', // Warna latar belakang untuk dark mode
   color: '#fff', // Warna teks untuk dark mode
-  iconColor: '#f39c12', // Warna ikon
+  iconColor: '#14ffc8', // Warna ikon
   customClass: {
     popup: 'shadow-lg', // Tambahkan bayangan
   },
