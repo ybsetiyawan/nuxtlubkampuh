@@ -68,13 +68,6 @@ class MenuController {
   async createMenu(req, res) {
     try {
       const { namaMenu, linkMenu, keterangan, classIcon, status } = req.body;
-
-      // if (!namaMenu || !linkMenu || !classIcon) {
-      //   return res
-      //     .status(400)
-      //     .json({ message: "Ada data yang belum dilengkapi" });
-      // }
-
       const newMenu = await MenuService.createMenu({
         namaMenu,
         linkMenu,
@@ -93,13 +86,6 @@ class MenuController {
   async updateMenu(req, res) {
     
     try {
-      const { namaMenu, linkMenu, classIcon } = req.body;
-
-      // if (!namaMenu || !linkMenu || !classIcon) {
-      //   return res
-      //     .status(400)
-      //     .json({ message: "Ada data yang belum dilengkapi" });
-      // }
       const updatedMenu = await MenuService.updateMenu(req.params.id, req.body);
       res.json({
         data: updatedMenu,
