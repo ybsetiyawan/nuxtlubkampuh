@@ -74,26 +74,22 @@ class CustomerRepository {
     return res.rows[0];
   }
 
-    
-    
-  
-  
   async createCustomer(customer) {
     const generateKode = async () => {
-      const result = await pool.query('SELECT kode FROM m_customer ORDER BY kode DESC LIMIT 1');
+      const result = await pool.query(
+        "SELECT kode FROM m_customer ORDER BY kode DESC LIMIT 1"
+      );
       let kodeTerakhir = result.rows[0]?.kode;
-      
+
       if (!kodeTerakhir) {
-        kodeTerakhir = 'A01';
+        kodeTerakhir = "A01";
       } else {
         const angka = parseInt(kodeTerakhir.substring(1));
-        kodeTerakhir = `A${String(angka + 1).padStart(2, '0')}`;
+        kodeTerakhir = `A${String(angka + 1).padStart(2, "0")}`;
       }
-      
+
       return kodeTerakhir;
     };
-    
-    
 
     // Generate UUID
     const id = uuidv4();

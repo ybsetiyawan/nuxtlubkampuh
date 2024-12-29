@@ -47,8 +47,6 @@ class UserController {
     }
   }
 
-  
-
   async createUser(req, res) {
     try {
       const { nama, username, password, idRole } = req.body;
@@ -153,6 +151,13 @@ class UserController {
             username: user.username,
             idRole: user.id_role ? user.id_role : null,
             nama: user.user || null,
+            idCustomer: user.id_customer || null,
+            kodeCustomer: user.kode_customer || null,
+            customer: user.customer || null,
+            customer: user.customer || null,
+            alamat: user.alamat || null,
+            noTelp: user.no_telp || null,
+            npwp: user.npwp || null,
             role: user.role
               ? {
                   id: user.id_role,

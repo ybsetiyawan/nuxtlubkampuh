@@ -74,14 +74,7 @@ class UserRepository {
   async updateUser(id, user) {
     const res = await pool.query(
       "UPDATE c_user SET nama = $1, username = $2, password =$3, id_role=$4, is_deleted=$5, updated_at = NOW() WHERE id = $6 RETURNING *",
-      [
-        user.nama,
-        user.username,
-        user.password,
-        user.idRole,
-        user.isDeleted,
-        id,
-      ]
+      [user.nama, user.username, user.password, user.idRole, user.isDeleted, id]
     );
     return res.rows[0];
   }
@@ -100,12 +93,15 @@ class UserRepository {
 
     return result.rows[0];
   }
-
-
+  // username
   async getUserByUsername(username) {
     const res = await pool.query(
-      `SELECT u.id, u.nama as user, u.username, u.password, u.id_role, r.nama as role, r.kode
-      FROM c_user u JOIN c_role r on r.id=u.id_role WHERE username = $1 AND u.is_deleted = false`,
+      `SELECT u.id, u.nama as user, u.username, u.password, u.id_role, r.nama as role, r.kode,
+      c.id as id_customer, c.kode kode_customer, c.nama customer, c.alamat, c.no_telp, c.email, c.npwp
+      FROM c_user u 
+      JOIN c_role r on r.id=u.id_role 
+      LEFT JOIN public.m_customer c on c.id=u.id_customer
+      WHERE username = $1 AND u.is_deleted = false `,
       [username]
     );
     return res.rows[0];

@@ -23,12 +23,14 @@ const app = express();
 //     maxAge: parseInt(process.env.APP_CORS_MAX_AGE_SECONDS, 10),
 //   };
 
-  app.use(cors({
-    origin: 'http://localhost:3000', // Sesuaikan dengan URL frontend Anda
+app.use(
+  cors({
+    origin: process.env.APP_CORS_ALLOWED_ORIGINS.split(","), // Sesuaikan dengan URL frontend Anda
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
-  }));
+    methods: process.env.APP_CORS_ALLOWED_METHODS,
+    allowedHeaders: process.env.APP_CORS_ALLOWED_HEADERS,
+  })
+);
 // }
 
 app.use(express.json());
