@@ -1,6 +1,6 @@
 <template>
-  <div class="error-page">
-    <div class="container">
+  <div class>
+    <div class>
       <div class="kode-erreur">
         <span v-if="error.statusCode === 404">404</span>
         <span v-else-if="error.statusCode === 500">500</span>
@@ -41,21 +41,7 @@ export default {
 </script>
 
 <style scoped>
-.error-page {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 50vh;
-  background-color: #121212;
-}
 
-.container {
-  text-align: center;
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  
-}
 
 .kode-erreur {
   font-size: 96px;

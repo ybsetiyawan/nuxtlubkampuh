@@ -179,7 +179,6 @@ export default {
       fixed: false,
       rightDrawer: false,
       right: false,
-      // title: this.$store.getUser.user.name,
       title: this.$cookies.get('nama'), 
       profileMenus: [
         {

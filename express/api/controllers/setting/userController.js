@@ -73,13 +73,6 @@ class UserController {
 
   async updateUser(req, res) {
     try {
-      const { nama, username, password, idRole } = req.body;
-
-      if (!nama || !username || !password || !idRole) {
-        return res
-          .status(400)
-          .json({ message: "Ada data yang belum dilengkapi" });
-      }
       const updatedUser = await UserService.updateUser(req.params.id, req.body);
       res.json({
         data: updatedUser,

@@ -14,6 +14,7 @@
       @add-item="openAddDialog"
       @edit-item="handleEditItem"
     />
+    <v-form ref="form">
     <form-dialog
       v-model="dialog"
       :title="dialogTitle"
@@ -34,10 +35,8 @@
         :rules="field.rules"
         :required="field.required"
       ></v-text-field>
-
-      
-
     </form-dialog>
+    </v-form>
   </div>
 </template>
 
@@ -64,7 +63,7 @@ export default {
         { text: 'Role', value: 'role', sortable: false },
       ],
       dialog: false,
-      dialogTitle: 'Tambah User Baru',
+      dialogTitle: '',
       loading: false,
       formFields: [
 
@@ -148,6 +147,13 @@ export default {
     },
 
     async save(formData) {
+      if (!this.$refs.form.validate()) {
+          this.$toast.fire({
+            icon: 'error',
+            title: 'Form tidak valid, silahkan isi data dengan benar!',
+          });
+          return
+      }
       this.loading = true;
       try {
         const token = this.$cookies.get(this.$config.tokenKey);
@@ -247,6 +253,7 @@ export default {
 
     openAddDialog() {
       this.isEditMode = false; // Atur ke mode tambah
+      this.dialogTitle = 'Tambah Data';
       this.edit = {
         user:'',
         username: '',
@@ -264,7 +271,7 @@ export default {
 
     handleEditItem(item) {
       this.isEditMode = true; // Atur ke mode edit
-      this.dialogTitle = 'Edit Menu';
+      this.dialogTitle = 'Edit Data';
       this.edit = {
         id: item.id,
         user: item.user || '',

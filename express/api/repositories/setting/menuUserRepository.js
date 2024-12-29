@@ -101,7 +101,7 @@ class MenuUserRepository {
       SELECT 
         mu.id, 
         m.id AS id_menu, 
-        m.nama_menu AS nama, 
+        m.nama_menu, 
         m.link_menu AS link, 
         m.keterangan, 
         m.class_icon AS classIcon, 
@@ -119,6 +119,78 @@ class MenuUserRepository {
     `;
     const res = await pool.query(query, [parentId, roleId]);
     return res.rows;
+  }
+  
+  async resolveAllMenuUser({ pageSize, pageNumber, q, sortBy, sortType }) {
+    const conditions = [];
+    const values = [];
+
+    // Kondisi pencarian jika ada
+    if (q) {
+      // Menambahkan kondisi untuk pencarian nama_menu dan link_menu
+      conditions.push(
+        `(nama_menu ILIKE $${values.length + 1} OR link_menu ILIKE $${
+          values.length + 2
+        })`
+      );
+      values.push(`%${q}%`, `%${q}%`); // Tambahkan kedua parameter ke values
+    }
+
+    let query = `
+       SELECT 
+          mu.id, 
+          m.id AS id_menu, 
+          m.nama_menu,
+          mu.parent,
+		      mp.nama_menu AS nama_parent,
+          m.link_menu AS link, 
+          m.keterangan, 
+          m.class_icon AS classicon, 
+          mu.urutan,
+          mu.level, 
+          mu.id_role,
+          cr.nama AS nama_role,
+          mu.is_deleted
+        FROM menu_user mu 
+        JOIN menu m on mu.id_menu = m.id
+		    LEFT JOIN menu mp ON mu.parent= mp.id
+        JOIN c_role cr ON mu.id_role = cr.id
+        WHERE mu.is_deleted = false
+      `;
+
+    
+
+    // Menambahkan kondisi pencarian jika ada
+    if (conditions.length > 0) {
+      query += " AND " + conditions.join(" AND ");
+    }
+
+    // Menambahkan sorting jika ada
+    if (sortBy && sortType) {
+      query += ` ORDER BY ${sortBy} ${sortType}`;
+    } else {
+      query += " ORDER BY nama_menu"; // Default sorting
+    }
+
+    // Mengatur limit dan offset untuk pagination
+    const offset = (pageNumber - 1) * pageSize;
+    query += ` LIMIT $${values.length + 1} OFFSET $${values.length + 2}`;
+    values.push(pageSize, offset);
+
+    // Eksekusi query untuk mendapatkan data
+    const result = await pool.query(query, values);
+
+    // Dapatkan total item tanpa limit dan offset
+    const countQuery = `
+        SELECT COUNT(*) 
+        FROM menu_user
+        WHERE is_deleted = false
+        ${conditions.length > 0 ? " AND " + conditions.join(" AND ") : ""}
+    `;
+    const countResult = await pool.query(countQuery, values.slice(0, -2)); // Menghapus limit dan offset dari values
+    const totalItems = parseInt(countResult.rows[0].count, 10);
+
+    return { users: result.rows, totalItems };
   }
 }
 

@@ -14,6 +14,7 @@
         @add-item="openAddDialog"
         @edit-item="handleEditItem"
       />
+      <v-form ref="form">
       <form-dialog
         v-model="dialog"
         :title="dialogTitle"
@@ -35,6 +36,7 @@
           :required="field.required"
         ></v-text-field>
       </form-dialog>
+      </v-form>
     </div>
   </template>
   
@@ -68,7 +70,7 @@
         //   { text: 'Keterangan', value: 'keterangan', sortable: false },
         ],
         dialog: false,
-        dialogTitle: 'Tambah Data Baru',
+        dialogTitle: '',
         loading: false,
         formFields: [
             
@@ -128,6 +130,13 @@
       },
   
       async save(formData) {
+        if (!this.$refs.form.validate()) {
+          this.$toast.fire({
+            icon: 'error',
+            title: 'Form tidak valid, silahkan isi data dengan benar!',
+          });
+          return
+        }
         this.loading = true;
         try {
           const token = this.$cookies.get(this.$config.tokenKey);
@@ -229,6 +238,7 @@
   
       openAddDialog() {
         this.isEditMode = false; // Atur ke mode tambah
+        this.dialogTitle = 'Tambah Data';
         this.edit = {
           kode:'',  
           nama: '',

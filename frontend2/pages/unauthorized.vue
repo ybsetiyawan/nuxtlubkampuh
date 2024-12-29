@@ -1,6 +1,6 @@
 <template>
-  <div class="unauthorized">
-    <div class="container">
+  <div class>
+    <div class>
       <div class="kode-erreur">
         <span>403</span>
       </div>
@@ -13,7 +13,7 @@
 
 
 <style>
-.unauthorized {
+/* .unauthorized {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -25,7 +25,7 @@
   text-align: center;
   border-radius: 16px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-}
+} */
 
 .kode-erreur {
   font-size: 96px;

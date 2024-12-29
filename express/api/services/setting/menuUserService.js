@@ -2,6 +2,10 @@ const MenuUserRepository = require("../../repositories/setting/menuUserRepositor
 const { formatMenuUser } = require("../../models/setting/menuUserModel");
 
 class MenuUserService {
+  async resolveAllMenuUser(filters) {
+      return await MenuUserRepository.resolveAllMenuUser(filters);
+  }
+
   async createMenuUser(menuUserData) {
     const newMenuUser = await MenuUserRepository.createMenuUser(menuUserData);
     return newMenuUser.map(formatMenuUser);

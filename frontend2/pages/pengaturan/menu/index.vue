@@ -1,44 +1,89 @@
 <template>
   <div>
-    <data-table
-      ref="dataTable"
-      :headers="menuHeaders"
-      :items="menuItems"
-      title="Data Menu"
-      searchTitle="Cari Menu"
-      :meta="meta"
-      :fetch-data="fetchData"
-      :transform-response="transformResponse"
-      default-sort-by="nama_menu"
-      default-sort-type="ASC"
-      @add-item="openAddDialog"
-      @edit-item="handleEditItem"
-    />
-    <v-form ref="form">
-    <form-dialog
-      v-model="dialog"
-      :title="dialogTitle"
-      :fields="formFields"
-      :initial-data="edit"
-      :loading="loading"
-      :is-edit-mode="isEditMode"
-      @save="save"
-      @delete="deleteItem"
-      @close="closeDialog"
-    >
-      <v-text-field
-        v-for="field in formFields"
-        :key="field.value"
-        v-model="edit[field.value]"
-        :label="field.text"
-        :type="field.type"
-        :rules="field.rules"
-        :required="field.required"
-      ></v-text-field>
-    </form-dialog>
-    </v-form>
+    <v-tabs v-model="tab">
+      <v-tab v-for="item in tabs" :key="item">{{ item }}</v-tab>
+    </v-tabs>
+    <v-tabs-items v-model="tab">
+      <v-tab-item>
+        <data-table
+          ref="dataTable"
+          :headers="menuHeaders"
+          :items="menuItems"
+          title="Data Menu"
+          searchTitle="Cari Menu"
+          :meta="meta"
+          :fetch-data="fetchData"
+          :transform-response="transformResponse"
+          default-sort-by="nama_menu"
+          default-sort-type="ASC"
+          @add-item="openAddDialog"
+          @edit-item="handleEditItem"
+          />
+        <v-form ref="form">
+          <form-dialog
+            v-model="dialog"
+            :title="dialogTitle"
+            :fields="formFields"
+            :initial-data="edit"
+            :loading="loading"
+            :is-edit-mode="isEditMode"
+            @save="save"
+            @delete="deleteItem"
+            @close="closeDialog" >
+            <v-text-field 
+              v-for="field in formFields"
+              :key="field.value"
+              v-model="edit[field.value]"
+              :label="field.text"
+              :type="field.type"
+              :rules="field.rules"
+              :required="field.required"
+              ></v-text-field>
+          </form-dialog>
+        </v-form>
+      </v-tab-item>
+      <v-tab-item>
+        <data-table
+          ref="dataTable"
+          :headers="menuHeaders2"
+          :items="menuItems"
+          title="Data Menu by Role"
+          searchTitle="Cari Menu"
+          :meta="meta"
+          :fetch-data="fetchData2"
+          :transform-response="transformResponse"
+          default-sort-by="id_role"
+          default-sort-type="ASC"
+          @add-item="openAddDialog"
+          @edit-item="handleEditItem"
+          />
+        <v-form ref="form">
+          <form-dialog
+            v-model="dialog"
+            :title="dialogTitle"
+            :fields="formFields"
+            :initial-data="edit"
+            :loading="loading"
+            :is-edit-mode="isEditMode"
+            @save="save"
+            @delete="deleteItem"
+            @close="closeDialog" >
+            <v-text-field 
+              v-for="field in formFields"
+              :key="field.value"
+              v-model="edit[field.value]"
+              :label="field.text"
+              :type="field.type"
+              :rules="field.rules"
+              :required="field.required"
+              ></v-text-field>
+          </form-dialog>
+        </v-form>
+      </v-tab-item>
+    </v-tabs-items>
   </div>
 </template>
+
 
 <script>
 import api from '@/service/api';
@@ -46,16 +91,15 @@ import DataTable from '@/components/common/DataTable.vue';
 import FormDialog from '~/components/common/FormDialog.vue';
 
 export default {
-  // middleware: 'auth',
-  //   meta: {
-  //     requiresRole: ['HA01'], // Hanya untuk admin
-  //   },
+
   components: {
     DataTable,
     FormDialog,
   },
   data() {
     return {
+      tab: 0,
+      tabs: ['Data Menu', 'Menu User'],
       menuItems: [],
       menuHeaders: [
         { text: 'No', value: 'no', width: '68px', sortable: false },
@@ -64,8 +108,19 @@ export default {
         { text: 'Class Icon', value: 'classIcon', sortable: false },
         { text: 'Keterangan', value: 'keterangan', sortable: false },
       ],
+
+      menuHeaders2: [
+        { text: 'No', value: 'no', width: '68px', sortable: false },
+        { text: 'Nama Menu', value: 'namaMenu', sortable: false },
+        { text: 'Nama Parent', value: 'namaParent', sortable: false },
+        { text: 'Link Menu', value: 'linkMenu', sortable: false },
+        { text: 'Urutan', value: 'urutan', sortable: false },
+        { text: 'Level', value: 'level', sortable: false },
+        { text: 'Nama Role', value: 'namaRole', sortable: false },
+      ],
+
       dialog: false,
-      dialogTitle: 'Tambah Menu Baru',
+      dialogTitle: '',
       loading: false,
       formFields: [
         {
@@ -108,13 +163,23 @@ export default {
       });
     },
 
+    async fetchData2(filter) {
+      const token = this.$cookies.get(this.$config.tokenKey);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return await api.get('/api/menu-user/all', {
+        headers: { Authorization: `Bearer ${token}` },
+        params: filter,
+      });
+    },
+
     async save(formData) {
-        if (!this.$refs.form.validate()) {
-          this.$toast.fire({
-            icon: 'error',
-            title: 'Form tidak valid, silahkan isi data dengan benar!',
-          });
-          return
+      
+      if (!this.$refs.form.validate()) {
+        this.$toast.fire({
+          icon: 'error',
+          title: 'Form tidak valid, silahkan isi data dengan benar!',
+        });
+        return
       }
       this.loading = true;
       try {
@@ -209,6 +274,7 @@ export default {
 
     openAddDialog() {
       this.isEditMode = false; // Atur ke mode tambah
+      this.dialogTitle = 'Tambah Data';
       this.edit = {
         namaMenu: '',
         linkMenu: '',
