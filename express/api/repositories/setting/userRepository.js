@@ -93,7 +93,7 @@ class UserRepository {
 
     return result.rows[0];
   }
-
+  // username
   async getUserByUsername(username) {
     const res = await pool.query(
       `SELECT u.id, u.nama as user, u.username, u.password, u.id_role, r.nama as role, r.kode,
