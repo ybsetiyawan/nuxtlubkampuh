@@ -76,7 +76,7 @@ export const actions = {
 
 
     const response = await api.post('/api/users/login', { username, password });
-    // console.log('Login Response:', response);
+    console.log('Login Response:', response);
 
     const { token, user, } = response.data.data;
     

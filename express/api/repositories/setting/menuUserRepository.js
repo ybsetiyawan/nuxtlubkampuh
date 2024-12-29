@@ -101,7 +101,7 @@ class MenuUserRepository {
       SELECT 
         mu.id, 
         m.id AS id_menu, 
-        m.nama_menu, 
+        m.nama_menu AS nama, 
         m.link_menu AS link, 
         m.keterangan, 
         m.class_icon AS classIcon, 
