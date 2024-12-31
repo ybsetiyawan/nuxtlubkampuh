@@ -10,6 +10,12 @@ class MenuUserService {
     const newMenuUser = await MenuUserRepository.createMenuUser(menuUserData);
     return newMenuUser.map(formatMenuUser);
   }
+
+  async updateMenuUser(id, menuUserData) {
+    const updatedMenuUser = await MenuUserRepository.updateMenuUser(id, menuUserData);
+    return formatMenuUser(updatedMenuUser);
+  }
+
   async getMenuUserByRoleId(roleId) {
     const parentMenus = await MenuUserRepository.getMenuUserByRoleId(roleId);
 

@@ -99,6 +99,20 @@ class MenuUserController {
       res.status(500).json({ message: error.message });
     }
   }
+
+  async updateMenuUser(req, res) {
+      
+      try {
+        const updatedMenuUser = await MenuUserService.updateMenuUser(req.params.id, req.body);
+        res.json({
+          data: updatedMenuUser,
+        });
+        
+      } catch (error) {
+        res.status(500).json({ message: error.message });
+        console.log(error)
+      }
+    }
 }
 
 module.exports = new MenuUserController();

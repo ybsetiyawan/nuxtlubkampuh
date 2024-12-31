@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.post("/", verifyToken, MenuUserController.createMenuUser);
 router.get("/",  verifyToken, MenuUserController.getMenuUserByRoleId);
+router.put("/:id", verifyToken, MenuUserController.updateMenuUser);
 router.get("/all", verifyToken, MenuUserController.resolveAllMenuUser);
 
 

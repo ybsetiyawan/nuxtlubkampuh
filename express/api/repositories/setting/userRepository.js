@@ -15,10 +15,10 @@ class UserRepository {
     if (q) {
       conditions.push(
         `(u.username ILIKE $${values.length + 1} OR u.nama ILIKE $${
-          values.length + 1
+          values.length + 2
         })`
       );
-      values.push(`%${q}%`);
+      values.push(`%${q}%`, `%${q}%`);
     }
 
     let query = `
@@ -30,7 +30,7 @@ class UserRepository {
     `;
 
     if (conditions.length > 0) {
-      query += " WHERE " + conditions.join(" AND ");
+      query += " AND " + conditions.join(" AND ");
     }
 
     if (sortBy && sortType) {
@@ -51,7 +51,7 @@ class UserRepository {
       SELECT COUNT(*) 
       FROM c_user u
       JOIN c_role r ON r.id = u.id_role
-      ${conditions.length > 0 ? "WHERE " + conditions.join(" AND ") : ""}
+      ${conditions.length > 0 ? "AND " + conditions.join(" AND ") : ""}
     `;
     const countResult = await pool.query(countQuery, values.slice(0, -2)); // Menghapus limit dan offset dari values
     const totalItems = parseInt(countResult.rows[0].count, 10);
