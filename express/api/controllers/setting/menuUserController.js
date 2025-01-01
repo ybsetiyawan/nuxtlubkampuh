@@ -113,6 +113,36 @@ class MenuUserController {
         console.log(error)
       }
     }
+  
+  async deleteMenuUser(req, res) {
+      try {
+        const id = req.params.id;
+        const deletedMenuUser = await MenuUserService.deleteMenuUser(id);
+  
+        if (!deletedMenuUser) {
+          return res.status(404).json({
+            data: {
+              message: "Menu tidak ditemukan",
+              success: false,
+            },
+          });
+        }
+  
+        res.json({
+          data: {
+            message: "Data Berhasil di Hapus",
+            success: true,
+          },
+        });
+      } catch (error) {
+        res.status(500).json({
+          data: {
+            message: error.message,
+            success: false,
+          },
+        });
+      }
+    }
 }
 
 module.exports = new MenuUserController();

@@ -4,7 +4,7 @@ class MenuController {
   async resolveAllMenu(req, res) {
     try {
       const filters = {
-        pageSize: parseInt(req.query.pageSize, 10) || 10,
+        pageSize: parseInt(req.query.pageSize, 10) || 30,
         pageNumber: parseInt(req.query.pageNumber, 10) || 1,
         q: req.query.q,
         sortBy: req.query.sortBy || "nama_menu",

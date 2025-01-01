@@ -19,6 +19,9 @@
                   :label="field.text"
                   :rules="field.rules"
                   :required="field.required"
+                  outlined
+                  dense
+
                 ></v-text-field>
   
                 <!-- Text Area -->
@@ -28,6 +31,9 @@
                   :label="field.text"
                   :rules="field.rules"
                   :required="field.required"
+                  outlined
+                  dense
+
                 ></v-textarea>
   
                 <!-- Select -->
@@ -38,6 +44,10 @@
                   :label="field.text"
                   :rules="field.rules"
                   :required="field.required || false"
+                  outlined
+                  dense
+
+
                 ></v-select>
               
               </v-col>
@@ -47,9 +57,9 @@
   
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="close" outlined>Batal</v-btn>
+          <v-btn color="yellow" text @click="close" outlined>Batal</v-btn>
           <v-btn 
-          color="blue darken-1" 
+          color="green" 
           text 
           @click="save"
           :loading="loading"

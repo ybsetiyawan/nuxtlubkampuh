@@ -38,7 +38,13 @@ export default {
               options:[],
     
             },
-            { text: 'Level', value: 'level', type: 'text' },
+            { 
+              text: 'Level',
+              value: 'level',
+              type: 'select',
+              rules: [(v) => !!v || 'Level harus dipilih'],
+              options : [1,2]
+            },
             { 
               text: 'Role',
               value: 'role',
@@ -142,17 +148,58 @@ export default {
             this.loading = false;
           }
         },
+
+        async deleteItem2(data) {
+          try {
+            // Menyesuaikan tampilan dialog konfirmasi dengan tema dark
+            const result = await this.$swal.fire({
+              title: 'Apakah Anda yakin?',
+              text: 'Data ini akan dihapus dan tidak bisa dikembalikan!',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Ya, hapus!',
+              cancelButtonText: 'Batal',
+              background: '#333',  // Dark background
+              color: '#fff',  // White text
+              iconColor: '#f39c12', // Yellow icon for warning
+              width: '450px',  // Adjust width of the popup
+            });
+    
+            if (result.isConfirmed) {
+              const token = this.$cookies.get(this.$config.tokenKey);
+              await api.delete(`/api/menu-user/${data.id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+              });
+    
+              this.closeDialog();
+              if (this.$refs.dataTable) {
+              await this.$refs.dataTable.loadData();
+            }
+              this.$toast.fire({
+                icon: 'success',
+                title: 'Data berhasil dihapus',
+              });
+            }
+            } catch (error) {
+            this.$toast.fire({
+            icon: 'error',
+            title: error.response?.data?.message || 'Gagal menghapus data',
+              });
+            }
+        },
     
         openAddDialog2() {
           this.isEditMode = false; // Atur ke mode tambah
-          this.dialogTitle = 'Tambah Data';
-          this.edit2 = {
-            namaMenu: '',
+          this.dialogTitleMenu = 'Tambah Menu Untuk Role';
+          this.edit = {
+            posisi: '',
             level: '',
           };
-          this.dialogMenu = true;
           this.fetchRole();
           this.fetchData();
+          this.dialogMenu = true;
         },
     
         closeDialogMenu() {
@@ -161,11 +208,12 @@ export default {
 
         handleEditItem2(item) {
           this.isEditMode = true; // Atur ke mode edit
-          this.dialogTitleMenu = 'Edit Menu User';
+          this.dialogTitleMenu = 'Edit Menu Role';
           this.edit2 = {
             id: item.id,
-            idMenu: item.namaMenu || '',
+            namaMenu: item.namaMenu || '',
             level: item.level || '',
+            role: item.idRole
           };
           this.dialogMenu = true;
           this.fetchRole();

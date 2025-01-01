@@ -206,14 +206,15 @@ class MenuUserRepository {
     try {
       // Ambil data menu-user saat ini
       const currentMenuUser = await pool.query(
-        `SELECT parent, level FROM menu_user WHERE id = $1`,
+        `SELECT parent, level, urutan FROM menu_user WHERE id = $1`,
         [id]
       );
   
       const currentParent = currentMenuUser.rows[0]?.parent;
       const currentLevel = currentMenuUser.rows[0]?.level;
+      const currentUrutan = currentMenuUser.rows[0]?.urutan;
   
-      let newOrder = menuUser.urutan;
+      let newOrder = menuUser.urutan || currentUrutan;
   
       if (menuUser.level === 1) {
         // Jika level berubah menjadi parent (level 1)
@@ -224,7 +225,7 @@ class MenuUserRepository {
           [menuUser.idRole]
         );
   
-        newOrder = maxOrder.rows[0].max_urutan + 1;
+        newOrder = maxOrder.rows[0].max_urutan + 1; // Tambahkan 1 untuk menjadi urutan terakhir di level 1
       } else if (menuUser.level === 2) {
         // Jika level adalah child (level 2)
         if (menuUser.parent !== currentParent || currentLevel !== menuUser.level) {
@@ -251,6 +252,19 @@ class MenuUserRepository {
         }
       }
   
+      // Pastikan newOrder tidak null
+      if (!newOrder) {
+        throw new Error("Urutan tidak dapat dihitung. Pastikan data valid.");
+      }
+
+      // console.log("Current Parent:", currentParent);
+      // console.log("Current Urutan:", currentUrutan);
+      // console.log("Current Level:", currentLevel);
+      // console.log("New Parent:", menuUser.parent);
+      // console.log("New Level:", menuUser.level);
+      // console.log("New Order:", newOrder);
+
+  
       // Lakukan pembaruan
       const res = await pool.query(
         `UPDATE menu_user 
@@ -274,7 +288,21 @@ class MenuUserRepository {
       console.error("Error updating menu user:", error);
       throw error;
     }
+
+    
   }
+
+  async deleteMenuUserStatus(id) {
+    const result = await pool.query(`
+      DELETE FROM menu_user
+      WHERE id = $1 RETURNING *
+    `, [id]);
+    
+    return result.rows[0];
+  }
+  
+
+  
   
 }
 

@@ -5,8 +5,8 @@ export default {
 
     data() {
         return {
-          tab: 1,
-          tabs: ['Data Menu', 'Menu User'],
+          tab: 0,
+          tabs: ['Menu', 'Menu Role'],
           menuItems: [],
           menuHeaders: [
             { text: 'No', value: 'no', width: '68px', sortable: false },

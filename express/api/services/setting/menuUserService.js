@@ -16,6 +16,12 @@ class MenuUserService {
     return formatMenuUser(updatedMenuUser);
   }
 
+  async deleteMenuUser(id) {
+    const result = await MenuUserRepository.deleteMenuUserStatus(id);
+    return result;
+  }
+  
+
   async getMenuUserByRoleId(roleId) {
     const parentMenus = await MenuUserRepository.getMenuUserByRoleId(roleId);
 
