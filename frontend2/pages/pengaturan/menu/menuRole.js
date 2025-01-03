@@ -5,6 +5,10 @@ export default {
 
     data() {
         return {
+          dialogMenuUser: false,
+          listMenu: [],
+          listRole: [],
+          role_selected: '',
           menuItems2: [],
           menuHeaders2: [
             { text: 'No', value: 'no', width: '68px', sortable: false },
@@ -63,6 +67,10 @@ export default {
         };
       },
 
+      created() { // Add this lifecycle hook
+        this.fetchRole(); // Call fetchRole2 when the component is created
+      },
+
 
       methods: {
 
@@ -70,6 +78,7 @@ export default {
           try {
           const response = await api.get('/api/roles');
           const roles = response.data.data;
+          this.listRole = roles;
           console.log('Role Data:', roles);
           const roleOptions = roles.map((role) => ({
             text: role.nama, // Ubah sesuai dengan nama field yang mewakili nama peran
@@ -92,6 +101,32 @@ export default {
             headers: { Authorization: `Bearer ${token}` },
             params: filter,
           });
+        },
+
+        async fetchMenu(roleId) {
+          const token = this.$cookies.get(this.$config.tokenKey);
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          try {
+            const response = await api.get(`/api/menu-user?roleId=${roleId}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            const menus = response.data.data;
+            this.listMenu = menus;
+
+
+            console.log('Role Selected:', this.role_selected);
+            console.log('List Menus:', this.listMenu);
+
+          } catch (error) {
+            console.error('error load menu',error)
+            this.listMenu =[];
+          }
+        },
+
+        handleRoleChange(roleId) {
+          console.log(this.role_selected);  // Menampilkan role yang dipilih di console
+          this.role_selected = roleId;
+          this.fetchMenu(roleId);
         },
 
         async save2(formData2) {

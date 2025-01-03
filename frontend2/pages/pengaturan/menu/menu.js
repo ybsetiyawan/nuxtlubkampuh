@@ -5,8 +5,9 @@ export default {
 
     data() {
         return {
-          tab: 0,
-          tabs: ['Menu', 'Menu Role'],
+          items: [],
+          tab: 2,
+          tabs: ['Menu', 'HAK AKSES','HAK AKSES NEW'],
           menuItems: [],
           menuHeaders: [
             { text: 'No', value: 'no', width: '68px', sortable: false },
