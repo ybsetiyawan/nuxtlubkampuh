@@ -282,9 +282,8 @@
                           v-bind="data.attrs"
                           :input-value="data.selected"
                           close
-                          @click="data.select"
-                          @click:close="remove(data.item)"
                         >
+                        
                           <v-avatar left>
                             <v-icon>{{ data.item.classIcon }}</v-icon>
                           </v-avatar>
@@ -340,6 +339,7 @@
                       item-value="id"
                       multiple
                     >
+                   
                       <template v-slot:selection="data">
                         <v-chip
                           v-bind="data.attrs"
@@ -385,6 +385,7 @@
                     </v-autocomplete>
                   </v-flex>
                 </v-layout>
+
               </div>
             </v-form>
           </v-card-text>

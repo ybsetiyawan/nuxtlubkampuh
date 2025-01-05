@@ -8,15 +8,14 @@ export default {
           dialogTitle: 'Tambah Menu',
           formTitle: 'Tambah Menu User',
           valid: true,
-          parent_selected: '',
+          parent_selected: [],
           menu_selected: [],
-          selected_item: [],
           dialogMenuUser: false,
           listMenu: [],
           level: null,
           list_level: [
-            { text: 'Level 1', value: 1 },
-            { text: 'Level 2', value: 2 },
+            { text: '1', value: 1 },
+            { text: '2', value: 2 },
           ],
           posisi: null,
           list_posisi: [
@@ -123,17 +122,22 @@ export default {
           // Logika untuk memindahkan menu ke bawah
         },
 
+        // remove(item) {
+        //   const index = this.selectedItems.findIndex(selected => selected.id === item.id);
+        //   if (index !== -1) {
+        //   this.selectedItems.splice(index, 1);
+        //   }
+        //   if (!item || !item.id) {
+        //     console.error('Item tidak valid:', item);
+        //     return;
+        //   }
+        //   console.log('Menghapus item:', item);
+        //   // Logik
+        // },
+
         remove(item) {
-          const index = this.selectedItems.findIndex(selected => selected.id === item.id);
-          if (index !== -1) {
-          this.selectedItems.splice(index, 1);
-          }
-          if (!item || !item.id) {
-            console.error('Item tidak valid:', item);
-            return;
-          }
-          console.log('Menghapus item:', item);
-          // Logik
+          const index = this.menu_selected.indexOf(item.id)
+          if (index >= 0) this.menu_selected.splice(index, 1)
         },
     
         async fetchData2(filter) {
