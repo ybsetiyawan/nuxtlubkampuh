@@ -5,6 +5,7 @@ export default {
 
     data() {
         return {
+          list_menu: [],
           items: [],
           tab: 2,
           tabs: ['Menu', 'HAK AKSES','HAK AKSES NEW'],
@@ -61,6 +62,10 @@ export default {
           isEditMode: false, // Tambahkan ini
         };
       },
+
+      created() { // Add this lifecycle hook
+        this.fetchData(); // Call fetchRole2 when the component is created
+      },
       methods: {
         
         async fetchData(filter) {
@@ -72,6 +77,8 @@ export default {
               params: filter,
             });
             const menus = response.data.data.items;
+            this.list_menu = menus;
+
             // console.log('Menu Data:', menus);
             const parentOptions = menus.map((p) => ({
             text: p.namaMenu, // Ubah sesuai dengan nama field yang mewakili nama peran

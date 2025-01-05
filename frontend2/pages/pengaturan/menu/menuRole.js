@@ -5,8 +5,23 @@ export default {
 
     data() {
         return {
+          dialogTitle: 'Tambah Menu',
+          formTitle: 'Tambah Menu User',
+          valid: true,
+          parent_selected: '',
+          menu_selected: [],
+          selected_item: [],
           dialogMenuUser: false,
           listMenu: [],
+          level: null,
+          list_level: [
+            { text: 'Level 1', value: 1 },
+            { text: 'Level 2', value: 2 },
+          ],
+          posisi: null,
+          list_posisi: [
+            { text: 'sidebar', value: 1}
+          ],
           listRole: [],
           role_selected: '',
           menuItems2: [],
@@ -93,6 +108,33 @@ export default {
           console.error('Gagal mengambil data role:', error);
           }
         },
+
+        getRoleName(roleId) {
+          const role = this.listRole.find((role) => role.id === roleId);
+          return role ? role.nama : 'Tidak Diketahui';
+        },
+
+        fn_menu_user_up(item) {
+          console.log('Menu ke atas:', item);
+          // Logika untuk memindahkan menu ke atas
+        },
+        fn_menu_user_down(item) {
+          console.log('Menu ke bawah:', item);
+          // Logika untuk memindahkan menu ke bawah
+        },
+
+        remove(item) {
+          const index = this.selectedItems.findIndex(selected => selected.id === item.id);
+          if (index !== -1) {
+          this.selectedItems.splice(index, 1);
+          }
+          if (!item || !item.id) {
+            console.error('Item tidak valid:', item);
+            return;
+          }
+          console.log('Menghapus item:', item);
+          // Logik
+        },
     
         async fetchData2(filter) {
           const token = this.$cookies.get(this.$config.tokenKey);
@@ -113,7 +155,6 @@ export default {
             const menus = response.data.data;
             this.listMenu = menus;
 
-
             console.log('Role Selected:', this.role_selected);
             console.log('List Menus:', this.listMenu);
 
@@ -128,6 +169,29 @@ export default {
           this.role_selected = roleId;
           this.fetchMenu(roleId);
         },
+
+        closeFormMenuUser() {
+          // this.$refs.formAkses.reset()
+          // this.$refs.formAkses.resetValidation()
+          this.level = ""
+          this.posisi = ""
+          this.parent_selected = ""
+          this.menu_selected = []
+          this.dialogMenuUser = !this.dialogMenuUser
+        },
+
+        // saveMenuUserValidate() {
+        //   if (this.$refs.formAkses.validate()) {
+        //     this.saveMenuUser()
+        //   }
+        // },
+
+        saveMenuUserValidate() {
+          console.log('Saving menu user...');
+        },
+       
+        
+        
 
         async save2(formData2) {
       
