@@ -115,25 +115,16 @@ export default {
         role: '',
       },
       isEditMode: false, // Tambahkan ini
+      roleOptions: [],
     };
   },
   methods: {
-    async fetchRole() {
-      try {
-      const response = await api.get('/api/roles');
-      const roles = response.data.data;
-      console.log('Role Data:', roles);
-      const roleOptions = roles.map((role) => ({
-        text: role.nama, // Ubah sesuai dengan nama field yang mewakili nama peran
-        value: role.id,  // Ubah sesuai dengan id atau kode unik peran
-      }));
-      const roleField = this.formFields.find((field) => field.value === 'role');
-        if (roleField) {
-        roleField.options = roleOptions;
-      }
 
-    } catch (error) {
-      console.error('Gagal mengambil data role:', error);
+    async updateRoleOptions() {
+      this.roleOptions = await this.$fetchRole(); // Panggil fungsi fetchRole
+      const roleField = this.formFields.find((field) => field.value === 'role');
+      if (roleField) {
+        roleField.options = this.roleOptions; // Atur options dengan roleOptions
       }
     },
 
@@ -205,20 +196,8 @@ export default {
     async deleteItem(data) {
       try {
         // Menyesuaikan tampilan dialog konfirmasi dengan tema dark
-        const result = await this.$swal.fire({
-          title: 'Apakah Anda yakin?',
-          text: 'Data ini akan dihapus dan tidak bisa dikembalikan!',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Ya, hapus!',
-          cancelButtonText: 'Batal',
-          background: '#333',  // Dark background
-          color: '#fff',  // White text
-          iconColor: '#f39c12', // Yellow icon for warning
-          width: '450px',  // Adjust width of the popup
-        });
+        const result = await this.$showConfirmationDialog();
+
 
         if (result.isConfirmed) {
           const token = this.$cookies.get(this.$config.tokenKey);
@@ -251,7 +230,7 @@ export default {
       };
     },
 
-    openAddDialog() {
+    async openAddDialog() {
       this.isEditMode = false; // Atur ke mode tambah
       this.dialogTitle = 'Tambah Data';
       this.edit = {
@@ -262,7 +241,7 @@ export default {
         // keterangan: '',
       };
       this.dialog = true;
-      this.fetchRole();
+      this.updateRoleOptions();
     },
 
     closeDialog() {
@@ -280,7 +259,8 @@ export default {
         id_role: item.role || '',
       };
       this.dialog = true;
-      this.fetchRole();
+      this.updateRoleOptions();
+
     },
   },
 };
