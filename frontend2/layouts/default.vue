@@ -6,7 +6,7 @@
       indeterminate
       absolute
       top
-      height="1"
+      height="3"
     ></v-progress-linear>
     <v-navigation-drawer
       v-model="drawer"
@@ -15,6 +15,41 @@
       fixed
       app
     >
+
+    <v-toolbar elevation="0" class="">
+      <v-toolbar-title class="ml-0">
+        <div style="display: flex">
+          <img :src="computeLogo" height="50"/>
+        </div>
+      </v-toolbar-title>
+    </v-toolbar>
+    <v-divider></v-divider>
+    
+
+    <!-- avatar dan user -->
+    <v-list-item
+      style="padding-bottom: 0px"
+      two-line
+      :class="miniVariant && 'px-2'"
+      link
+    >
+      <v-list-item-avatar color="#ecf0f1" size="42">
+        <img
+          style="width: 100%; height: 100%; object-fit: cover"
+          :src="avatar"
+          @error="$event.target.src = '/_nuxt/assets/avatar/boy.png'"
+        />
+      </v-list-item-avatar>
+      <v-list-item-content>
+        <v-list-item-title style="font-size: 11pt">{{
+          userData.nama
+        }}</v-list-item-title>
+        <v-list-item-subtitle style="font-size: 10pt">{{
+          userData.role.name
+        }}</v-list-item-subtitle>
+      </v-list-item-content>
+    </v-list-item>
+    <v-divider></v-divider>
 
     <v-list class="pa-0">
         <template v-for="(item, index) in items ">
@@ -99,7 +134,8 @@
       >
         <v-icon>mdi-minus</v-icon>
       </v-btn>
-      <v-toolbar-title>Selamat Datang kembali, {{ title }}</v-toolbar-title>
+      <v-toolbar-title> 
+        <span style="color: #01579b;"> Selamat Datang kembali, {{ userData.nama }}</span></v-toolbar-title>
       <v-spacer />
       <!-- <v-btn
         icon
@@ -179,7 +215,7 @@ export default {
       fixed: false,
       rightDrawer: false,
       right: false,
-      title: this.$cookies.get('nama'), 
+      userData: this.$cookies.get('user'), 
       profileMenus: [
         {
           icon: "mdi-account",
@@ -209,7 +245,9 @@ export default {
     avatar() {
       return require(`~/assets/avatar/boy.png`);
     },
-
+    computeLogo() {
+      return require(`~/static/logo.png`);
+    },
     isLoading() {
     return this.$store.state.loading;
   },
@@ -240,12 +278,27 @@ export default {
       }
     },
 
-    handleLogout() {
-      this.$store.dispatch('logout');
+    async handleLogout() {
+      try{
+        const result = await this.$showConfirmationDialog();
+        if(result.isConfirmed) {
+          this.$root.$emit("start-loading"); // Mulai loading
+          await new Promise((resolve) => setTimeout(resolve, 1000)); // Tambahkan penundaan 1 detik
+          this.$store.dispatch('logout');
+        }
+      } catch (error) {
+        this.$toast.fire({
+            icon: 'error',
+            title: error.response?.data?.message || 'Gagal Logout',
+            });
+      } finally {
+              this.$root.$emit("stop-loading"); // Selesai loading
+        }
     },
-    
 
-   
+    handleProfile() {
+      this.$router.push("/pengaturan/user/profile");
+    },
   },
 };
 </script>
@@ -258,7 +311,7 @@ export default {
 } 
 
 .loading-bar {
-  background-image: linear-gradient(to right, rgb(245, 7, 7), rgb(7, 143, 255));
+  background-image: linear-gradient(to right, rgb(245, 7, 245), rgb(64, 245, 119));
 }
 </style>
 

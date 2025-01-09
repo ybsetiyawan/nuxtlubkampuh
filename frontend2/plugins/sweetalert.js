@@ -19,16 +19,15 @@ const Toast = Swal.mixin({
 export const showConfirmationDialog = async () => {
   return await Swal.fire({
     title: 'Apakah Anda yakin?',
-    text: 'Data ini akan dihapus dan tidak bisa dikembalikan!',
     icon: 'warning',
     showCancelButton: true,
     confirmButtonColor: '#3085d6',
     cancelButtonColor: '#d33',
-    confirmButtonText: 'Ya, hapus!',
+    confirmButtonText: 'Ya ..!',
     cancelButtonText: 'Batal',
-    background: '#333',  // Dark background
-    color: '#fff',  // White text
-    iconColor: '#f39c12', // Yellow icon for warning
+    background: '#FFFF',  // Dark background
+    color: 'black',  // White text
+    iconColor: '#FF9800', // Yellow icon for warning
     width: '450px',  // Adjust width of the popup
   });
 };

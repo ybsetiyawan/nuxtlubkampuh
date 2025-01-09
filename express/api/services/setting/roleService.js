@@ -2,6 +2,10 @@ const RolesRepository = require("../../repositories/setting/roleRepository");
 const { formatRoleAll } = require("../../models/setting/roleModel");
 
 class RolesService {
+  async resolveAllRoles(filters) {
+      return await RolesRepository.resolveAllRoles(filters);
+  }
+
   async getAllRoles() {
     const roles = await RolesRepository.getAllRoles();
     return roles.map(formatRoleAll);

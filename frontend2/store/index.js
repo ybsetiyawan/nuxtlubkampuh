@@ -2,7 +2,6 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import api from '@/service/api';
 import { fetchMenuItems } from './menu';
-import loading from '~/plugins/loading';
 
 Vue.use(Vuex);
 
@@ -32,9 +31,9 @@ export const mutations = {
   setItems(state, items) {
     state.items = items;
   },
-  setNama(state, nama) {
-    state.nama = nama;
-  },
+  // setNama(state, nama) {
+  //   state.nama = nama;
+  // },
   setLoading(state, value) {
     state.loading = value
   }
@@ -87,16 +86,20 @@ export const actions = {
     commit('setIdRole', user.idRole);
     this.$cookies.set('idRole', user.idRole);
     // commit('setNama', user.nama);
-    this.$cookies.set('nama', user.nama);
+    // this.$cookies.set('nama', user.nama);
     this.$cookies.set('kode', user.role.kode);
+    // commit('setUserData', user);
+    this.$cookies.set('user', user);
+
   },
 
   async logout({ commit }) {
     commit('clearAuth');
     this.$cookies.remove(this.$config.tokenKey)
     this.$cookies.remove('idRole');
-    this.$cookies.remove('nama');
+    // this.$cookies.remove('nama');
     this.$cookies.remove('kode');
+    this.$cookies.remove('user');
     this.$router.push('/login');
   },
 

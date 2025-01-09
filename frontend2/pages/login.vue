@@ -13,7 +13,7 @@
       indeterminate
       absolute
       top
-      height="1.5"
+      height="3"
     ></v-progress-linear>
 
     <div>
@@ -25,6 +25,7 @@
         <v-card-text>
           <v-form v-model="valid" @submit.prevent="submitLogin">
             <v-text-field
+              class="usernamefield"
               placeholder="Username"
               label="Username"
               v-model="username"
@@ -129,25 +130,25 @@ export default {
 }
 
 .card-login {
-  margin-left: 900px !important;
-  margin-top: -20px !important;
-  width: 25vw !important;
-  height: 60vh !important;
-  max-width: 100% !important;
-  background-color: rgba(0, 0, 0, 0.308) !important;
+  margin: auto;
+  width: 90%;
+  max-width: 400px;
+  height: auto;
+  background-color: rgba(210, 208, 206, 0.8) !important;
   backdrop-filter: blur(4px) !important;
   border-radius: 10px !important;
 }
 
 .logo-login {
-  width: 85%;
-  height: 18%;
-  display: flex;
-  margin-left: 20px;
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
 }
 
 h2.login-title {
-  margin-left: 20px;
+  text-align: center;
+  margin: 20px 0;
 }
 
 .loading-bar {
@@ -157,6 +158,7 @@ h2.login-title {
     rgb(226, 7, 255)
   );
 }
+
 
 /* .v-progress-linear.loading-bar .v-progress-linear__bar {
   background-image: inherit;

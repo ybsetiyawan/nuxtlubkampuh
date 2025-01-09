@@ -2,9 +2,7 @@
   <v-container fluid>
     <v-card>
     <v-card-text class="py-5">
-    <!-- <v-toolbar-title style="color: white">{{title}}</v-toolbar-title>
-        <v-divider class="mx-4" inset vertical/>
-        <v-spacer/> -->
+    
     <v-data-table class="table"
       :headers="headers"
       :items="tableItems"
@@ -21,7 +19,7 @@
     </template>
     <template v-slot:top>
         <v-toolbar flat>
-          <v-toolbar-title style="color: white">{{
+          <v-toolbar-title style="color: #01579b">{{
             title
           }}</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
@@ -34,18 +32,45 @@
             flat
             hide-details
             clearable
-            class="mr-2"
+            class="mr-2 text-field"
             append-icon="mdi-magnify"
-            color="white"
             :placeholder="searchTitle"
+            outlined
+            dense
+            color="#26C6DA"
           >
           </v-text-field>
-          <v-btn icon @click="loadData">
-            <v-icon>mdi-refresh</v-icon>
-          </v-btn>
-          <v-btn icon @click="$emit('add-item')">
-            <v-icon>mdi-plus</v-icon>
-          </v-btn>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  icon
+                  @click="loadData"
+                  v-on="on"
+                >
+                  <v-icon color="blue">mdi-refresh</v-icon>
+                </v-btn>
+              </template>
+              <span>Refresh data</span>
+            </v-tooltip>
+
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  icon
+                  @click="$emit('add-item')"
+                  v-on="on"
+                >
+                  <v-icon color="green">mdi-plus</v-icon>
+                </v-btn>
+              </template>
+              <span>Tambah data</span>
+            </v-tooltip>
+            <!-- <v-btn
+              icon
+              @click="$emit('add-item')"
+              >
+              <v-icon color="green">mdi-plus</v-icon>
+            </v-btn> -->
         </v-toolbar>
       </template>
       <template v-for="(_, slotName) in $slots" v-slot:[slotName]="scope">
@@ -183,20 +208,16 @@
   </script>
 
 <style scoped>
-.v-data-table >>> .v-data-table__progress .v-progress-linear__determinate,
-.v-data-table >>> .v-data-table__progress .v-progress-linear__indeterminate {
-  background-color: rgb(0, 255, 106) !important;
-}
 .v-data-table.table {
   border: thin solid rgba(255, 251, 251, 0.12);
 }
 
 .v-data-table.table >>> td {
-  border: thin solid rgba(255, 251, 251, 0.12);
+  border: thin solid rgba(7, 1, 1, 0.12);
 }
 
 .v-data-table.table >>> th {
-  border: thin solid rgba(255, 251, 251, 0.12);
+  border: thin solid rgba(7, 1, 1, 0.12);
 }
 .v-card {
   width: 100%;
@@ -206,5 +227,16 @@
   width: 100%;
   padding: 16px !important; /* Sesuaikan padding sesuai kebutuhan */
 }
+
+/* .button{
+  margin-left: 15px;
+  border-radius: 15px;
+  background-color: white !important;
+  height: 40px !important;
+
+} */
+
+
+
 
 </style>

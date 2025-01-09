@@ -46,10 +46,7 @@
                   :required="field.required || false"
                   outlined
                   dense
-
-
                 ></v-select>
-              
               </v-col>
             </v-row>
           </v-container>
@@ -57,25 +54,15 @@
   
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="yellow" text @click="close" outlined>Batal</v-btn>
-          <v-btn 
-          color="green" 
-          text 
-          @click="save"
-          :loading="loading"
-          :disabled="loading"
-          outlined
-          >
-          Simpan
-        </v-btn>
-        <v-btn
-          v-if="isEditMode"
-          color="red darken-1"
-          text
-          outlined
-          @click="deleteItem"
-          :loading="loading"
-          :disabled="loading">Hapus</v-btn>
+            <v-btn color="yellow" @click="close">Batal</v-btn>
+            <v-btn color="success" @click="save"
+            >Simpan</v-btn>
+            <v-btn
+              v-if="isEditMode"
+              color="error"
+              @click="deleteItem"
+              >Hapus
+            </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

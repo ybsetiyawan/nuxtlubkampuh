@@ -2,7 +2,7 @@ export default {
     data() {
         return {
             // MENU
-            tab: 1,
+            tab: 0,
             tabs: ['Menu', 'HAK AKSES'],
             list_menu: [],
             items: [],

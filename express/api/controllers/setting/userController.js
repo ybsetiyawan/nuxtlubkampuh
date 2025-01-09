@@ -154,9 +154,9 @@ class UserController {
             idCustomer: user.id_customer || null,
             kodeCustomer: user.kode_customer || null,
             customer: user.customer || null,
-            customer: user.customer || null,
             alamat: user.alamat || null,
             noTelp: user.no_telp || null,
+            email: user.email || null,
             npwp: user.npwp || null,
             role: user.role
               ? {

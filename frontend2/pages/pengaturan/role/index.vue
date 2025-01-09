@@ -9,7 +9,7 @@
         :meta="meta"
         :fetch-data="fetchData"
         :transform-response="transformResponse"
-        default-sort-by="username"
+        default-sort-by="kode"
         default-sort-type="ASC"
         @add-item="openAddDialog"
         @edit-item="handleEditItem"
@@ -58,9 +58,7 @@
         menuHeaders: [
           { text: 'No', value: 'no', width: '68px', sortable: false },
           { text: 'Kode', value: 'kode', sortable: false },
-          { text: 'User', value: 'user', sortable: false }, 
-          { text: 'Username', value: 'username', sortable: false }, 
-          { text: 'Role', value: 'role', sortable: false },
+          { text: 'Nama', value: 'nama', sortable: false }, 
         ],
         dialog: false,
         dialogTitle: '',
@@ -68,71 +66,40 @@
         formFields: [
   
           {
-            text: 'User',
-            value: 'user',
+            text: 'Kode',
+            value: 'kode',
+            type: 'text',
+            required: true,
+            rules: [
+              (v) => !!v || 'Kode harus diisi',
+              (v) => v.length >= 4 || 'Kode minimal 4 karakter',
+            ],
+          },
+          {
+            text: 'Nama',
+            value: 'nama',
             type: 'text',
             required: true,
             rules: [
               (v) => !!v || 'Nama harus diisi',
-              (v) => v.length >= 5 || 'Nama minimal 5 karakter',
             ],
           },
-          {
-            text: 'Username',
-            value: 'username',
-            type: 'text',
-            required: true,
-            rules: [
-              (v) => !!v || 'Username harus diisi',
-              (v) => v.length >= 5 || 'Username minimal 5 karakter',
-            ],
-          },
-          {
-            text: 'Password',
-            value: 'password',
-            type: 'text',
-            required: true,
-            rules: [
-              (v) => !!v || 'Password harus diisi',
-              (v) => v.length >= 8 || 'Password minimal 8 karakter',
-  
-            ],
-          },
-          { 
-            text: 'Role',
-            value: 'role',
-            type: 'select',
-            options:[],
-            rules: [(v) => !!v || 'Rule harus dipilih']
-  
-           },
+          
         ],
         meta: {},
         edit: {
-          user: '',
-          username: '',
-          password: '',
-          role: '',
+          kode: '',
+          nama: '',
         },
         isEditMode: false, // Tambahkan ini
-        roleOptions: [],
       };
     },
     methods: {
   
-      async updateRoleOptions() {
-        this.roleOptions = await this.$fetchRole(); // Panggil fungsi fetchRole
-        const roleField = this.formFields.find((field) => field.value === 'role');
-        if (roleField) {
-          roleField.options = this.roleOptions; // Atur options dengan roleOptions
-        }
-      },
   
       async fetchData(filter) {
-        const token = this.$cookies.get(this.$config.tokenKey);
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        return await api.get('/api/users', {
-          headers: { Authorization: `Bearer ${token}` },
+        return await api.get('/api/roles/all', {
           params: filter,
         });
       },
@@ -151,21 +118,19 @@
           const isEdit = this.edit.id;
   
           const payload = {
-            nama: formData.user,
-            username: formData.username,
-            password: formData.password,
-            idRole: formData.role,
+            kode: formData.kode,
+            nama: formData.nama,
             isDeleted: false,
           };
           console.log('Data Add', payload);
   
           let apiCall;
           if (isEdit) {
-            apiCall = api.put(`/api/users/${this.edit.id}`, payload, {
+            apiCall = api.put(`/api/roles/${this.edit.id}`, payload, {
               headers: { Authorization: `Bearer ${token}` },
             });
           } else {
-            apiCall = api.post(`/api/users`, payload, {
+            apiCall = api.post(`/api/roles`, payload, {
               headers: { Authorization: `Bearer ${token}` },
             });
           }
@@ -201,7 +166,7 @@
   
           if (result.isConfirmed) {
             const token = this.$cookies.get(this.$config.tokenKey);
-            await api.delete(`/api/users/${data.id}`, {
+            await api.delete(`/api/roles/${data.id}`, {
               headers: { Authorization: `Bearer ${token}` },
             });
   
@@ -234,14 +199,11 @@
         this.isEditMode = false; // Atur ke mode tambah
         this.dialogTitle = 'Tambah Data';
         this.edit = {
-          user:'',
-          username: '',
-          password: '',
-          // role: '',
-          // keterangan: '',
+          kode:'',
+          nama: '',
         };
         this.dialog = true;
-        this.updateRoleOptions();
+        // this.updateRoleOptions();
       },
   
       closeDialog() {
@@ -253,13 +215,11 @@
         this.dialogTitle = 'Edit Data';
         this.edit = {
           id: item.id,
-          user: item.user || '',
-          username: item.username || '',
-          password: item.password || '',
-          id_role: item.role || '',
+          kode: item.kode || '',
+          nama: item.nama || '',
         };
         this.dialog = true;
-        this.updateRoleOptions();
+        // this.updateRoleOptions();
   
       },
     },
