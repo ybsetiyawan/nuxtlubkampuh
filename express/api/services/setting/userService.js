@@ -44,6 +44,13 @@ class UserService {
   async verifyPassword(inputPassword, storedHashedPassword) {
     return await bcrypt.compare(inputPassword, storedHashedPassword);
   }
+
+  async updatePassword(id, newPassword) {
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+    return await UserRepository.updatePassword(id, hashedPassword);
+  }
+  
 }
 
 module.exports = new UserService();

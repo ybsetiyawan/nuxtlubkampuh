@@ -29,6 +29,7 @@ class UserController {
             idRole: item.id_role,
             role: item.role,
             kode: item.kode,
+            kode_customer: item.kode_customer
           })),
           meta: {
             totalItems,
@@ -188,6 +189,37 @@ class UserController {
       res.status(500).json({ message: error.message });
     }
   }
+
+  async updatePassword(req, res) {
+    try {
+      const { id } = req.params; // ID user dari parameter
+      const { newPassword } = req.body; // Password baru dari body request
+  
+      if (!newPassword) {
+        return res.status(400).json({ message: "Password baru harus diisi" });
+      }
+  
+      // Panggil service untuk memperbarui password
+      await UserService.updatePassword(id, newPassword);
+  
+      res.json({
+        data: {
+          message: "Password berhasil diperbarui",
+          success: true,
+        },
+      });
+    } catch (error) {
+      res.status(500).json({
+        data: {
+          message: error.message,
+          success: false,
+        },
+      });
+    }
+  }
+  
+
+  
 }
 
 module.exports = new UserController();

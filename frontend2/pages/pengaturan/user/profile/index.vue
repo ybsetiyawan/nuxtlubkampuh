@@ -49,9 +49,7 @@
                     "
                     src="~/assets/avatar/boy.png"
                     alt="_foto"
-                    @error="
-                      $event.target.src = '/_nuxt/assets/img/superadmin.png'
-                    "
+                    
                   />
                 </div>
                 <!-- <div style="margin: 5px">
@@ -91,32 +89,38 @@
             <v-divider></v-divider>
             <v-card-text>
               <table class="dt-profile">
-                <tr>
-                  <th class="text-left">Nama</th>
-                  <th class="text-center">:</th>
-                  <td class="text-left">{{ dataCustomer.customer }}</td>
-                </tr>
-                <tr>
-                  <th class="text-left">No Telp</th>
-                  <th class="text-center">:</th>
-                  <td class="text-left">{{ dataCustomer.noTelp }}</td>
-                </tr>
-                <tr>
-                  <th class="text-left">Alamat</th>
-                  <th class="text-center">:</th>
-                  <td class="text-left">{{ dataCustomer.alamat }}</td>
-                </tr>
-                <tr>
-                  <th class="text-left">Email</th>
-                  <th class="text-center">:</th>
-                  <td class="text-left">{{ dataCustomer.email }}</td>
-                </tr>
-                <tr>
-                  <th class="text-left">NPWP</th>
-                  <th class="text-center">:</th>
-                  <td class="text-left">{{ dataCustomer.npwp }}</td>
-                </tr>
-
+                <tbody>
+                  <tr>
+                    <th class="text-left">Kode</th>
+                    <th class="text-center">:</th>
+                    <td class="text-left">{{ dataCustomer.kodeCustomer }}</td>
+                  </tr>
+                  <tr>
+                    <th class="text-left">Nama</th>
+                    <th class="text-center">:</th>
+                    <td class="text-left">{{ dataCustomer.customer }}</td>
+                  </tr>
+                  <tr>
+                    <th class="text-left">No Telp</th>
+                    <th class="text-center">:</th>
+                    <td class="text-left">{{ dataCustomer.noTelp }}</td>
+                  </tr>
+                  <tr>
+                    <th class="text-left">Alamat</th>
+                    <th class="text-center">:</th>
+                    <td class="text-left">{{ dataCustomer.alamat }}</td>
+                  </tr>
+                  <tr>
+                    <th class="text-left">Email</th>
+                    <th class="text-center">:</th>
+                    <td class="text-left">{{ dataCustomer.email }}</td>
+                  </tr>
+                  <tr>
+                    <th class="text-left">NPWP</th>
+                    <th class="text-center">:</th>
+                    <td class="text-left">{{ dataCustomer.npwp }}</td>
+                  </tr>
+                </tbody>
               </table>
             </v-card-text>
           </v-card>
@@ -190,7 +194,7 @@
         transition="dialog-bottom-transition"
       >
         <v-card>
-          <v-card-title style="background-color: blue; color: white">
+          <v-card-title style="background-color: #2B81D6; color: white">
             <span style="font-size: 18px; padding-right: 10px"
               >Ubah Password</span
             >
@@ -239,7 +243,7 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer />
-            <v-btn color="primary" @click="savePassword">Simpan</v-btn>
+            <v-btn color="primary" @click="validateAndSavePassword">Simpan</v-btn>
             <v-btn color="error" @click="closePassword">Batal</v-btn>
           </v-card-actions>
         </v-card>
@@ -248,6 +252,8 @@
   </template>
 
 <script>
+import api from '@/service/api';
+
 export default{
     data() {
         return {
@@ -275,7 +281,100 @@ export default{
             this.showPassLama = false
             this.showPass = false
             this.dialogPassword = false
+        },
+
+        async savePassword() {
+      try {
+        const token = this.$cookies.get(this.$config.tokenKey); // Mendapatkan token autentikasi
+
+        // Langkah 1: Gunakan Endpoint Login untuk Verifikasi Password Lama
+        const verifyPayload = {
+          id: this.dataCustomer.id, // Gunakan ID user sebagai pengganti username
+          password: this.oldPassword, // Password lama untuk verifikasi
+          username: this.dataCustomer.username
+        };
+
+        const verifyResponse = await api.post(
+          '/api/users/login',  // Gunakan endpoint login yang ada
+          verifyPayload
+        );
+
+        if (verifyResponse.status === 200) {
+          // Langkah 2: Update Password Baru
+          const updatePayload = { newPassword: this.newPassword };
+          const updateResponse = await api.put(
+            `/api/users/${this.dataCustomer.id}/password`,
+            updatePayload,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`, // Pastikan menggunakan token jika diperlukan autentikasi
+              },
+            }
+          );
+
+          if (updateResponse.status === 200) {
+            this.$toast.fire({
+              icon: 'success',
+              title: 'Password berhasil diperbarui', // Pesan sukses
+            });
+            this.closePassword(); // Tutup dialog setelah berhasil
+          }
         }
+      } catch (error) {
+        // console.error('Error Save data:', error);
+        this.$toast.fire({
+          icon: 'error',
+          title: 'Password Lama tidak sesuai', // Pesan error
+        });
+      }
+    },
+
+
+
+        // async savePassword() {
+        //   try {
+        //     // const token = this.$cookies.get(this.$config.tokenKey);
+
+        //     const payload = {
+        //       oldPassword: this.oldPassword,
+        //       newPassword: this.newPassword,
+        //       id: this.dataCustomer.id,
+        //       isDeleted: false,
+        //     };
+        //     console.log('Data Add', payload);
+
+        //     // Directly call the API to update the password
+        //     // const apiCall = api.put(`/api/users/${this.dataCustomer.id}`, payload, {
+        //     //   headers: { Authorization: `Bearer ${token}` },
+        //     // });
+
+        //     // await apiCall;
+        //     // this.closePassword(); // Close the password dialog
+
+        //     // this.$toast.fire({
+        //     //   icon: 'success',
+        //     //   title: 'Password berhasil diperbarui', // Success message
+        //     // });
+        //   } catch (error) {
+        //     console.error('Error Save data:', error);
+        //     this.$toast.fire({
+        //       icon: 'error',
+        //       title:
+        //         error.response?.data?.message || 'Gagal Ubah Password',
+        //     });
+        //   } finally {
+        //     this.loading = false;
+        //   }
+        // },
+        
+        validateAndSavePassword() {
+            this.$refs.formPass.validate(); // Memvalidasi form
+            if (this.$refs.formPass.validate()) {
+                this.savePassword(); // Panggil metode savePassword jika validasi berhasil
+            }
+        },
+
+        
     }
 }
 </script>

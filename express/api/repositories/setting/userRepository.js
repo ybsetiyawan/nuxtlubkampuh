@@ -22,10 +22,11 @@ class UserRepository {
     }
 
     let query = `
-      SELECT u.id, u.nama AS user, u.username, u.id_role, u.is_deleted,
-             r.nama AS role, r.kode 
+      SELECT u.id, u.nama AS user, u.username, u.id_role, u.is_deleted, u.id_customer,
+             r.nama AS role, r.kode ,c.kode AS kode_customer
       FROM c_user u
       JOIN c_role r ON r.id = u.id_role
+      LEFT JOIN m_customer c ON c.id = u.id_customer
       WHERE u.is_deleted = false
     `;
 
@@ -106,6 +107,19 @@ class UserRepository {
     );
     return res.rows[0];
   }
+
+  async updatePassword(id, hashedPassword) {
+    const result = await pool.query(
+      `UPDATE c_user SET password = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
+      [hashedPassword, id]
+    );
+    return result.rows[0];
+  }
+
+  
+  
+
+  
 }
 
 module.exports = new UserRepository();

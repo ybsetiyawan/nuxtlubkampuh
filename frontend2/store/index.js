@@ -59,6 +59,7 @@ export const getters = {
 };
 
 //cek idRole dan token saat halaman di load kembali, jika ada maka langsung di load menu, jika tidak ada maka di redirect ke login
+
 export const actions = {
   async nuxtServerInit({ commit }, { req }) {
     // Memuat token dan idRole dari cookies saat server-side rendering

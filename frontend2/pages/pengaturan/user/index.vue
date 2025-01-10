@@ -61,6 +61,7 @@ export default {
         { text: 'User', value: 'user', sortable: false }, 
         { text: 'Username', value: 'username', sortable: false }, 
         { text: 'Role', value: 'role', sortable: false },
+        { text: 'Cust cd', value: 'kode_customer', sortable: false },
       ],
       dialog: false,
       dialogTitle: '',
@@ -104,6 +105,14 @@ export default {
           type: 'select',
           options:[],
           rules: [(v) => !!v || 'Rule harus dipilih']
+
+         },
+         { 
+          text: 'Customer',
+          value: 'customer',
+          type: 'select',
+          options:[],
+          rules: []
 
          },
       ],
