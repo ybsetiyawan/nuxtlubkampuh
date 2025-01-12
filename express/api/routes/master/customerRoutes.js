@@ -10,4 +10,8 @@ router.put("/:id", verifyToken, CustomerController.updateCustomer);
 router.get("/all/all", verifyToken, CustomerController.getCustomerAll);
 router.delete("/:id", verifyToken, CustomerController.deleteCustomer);
 
+
+
+
+
 module.exports = router;

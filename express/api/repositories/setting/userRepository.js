@@ -66,16 +66,16 @@ class UserRepository {
     const id = uuidv4();
 
     const res = await pool.query(
-      "INSERT INTO c_user (id, nama, username, password, id_role) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-      [id, user.nama, user.username, user.password, user.idRole]
+      "INSERT INTO c_user (id, nama, username, password, id_role, id_customer) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+      [id, user.nama, user.username, user.password, user.idRole, user.idCustomer]
     );
     return res.rows[0];
   }
 
   async updateUser(id, user) {
     const res = await pool.query(
-      "UPDATE c_user SET nama = $1, username = $2, password =$3, id_role=$4, is_deleted=$5, updated_at = NOW() WHERE id = $6 RETURNING *",
-      [user.nama, user.username, user.password, user.idRole, user.isDeleted, id]
+      "UPDATE c_user SET nama = $1, username = $2, password =$3, id_role=$4, id_customer=$5, is_deleted=$6, updated_at = NOW() WHERE id = $7 RETURNING *",
+      [user.nama, user.username, user.password, user.idRole, user.idCustomer, user.isDeleted, id]
     );
     return res.rows[0];
   }

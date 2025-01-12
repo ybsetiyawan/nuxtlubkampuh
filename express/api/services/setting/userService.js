@@ -14,7 +14,8 @@ class UserService {
       nama: userData.nama,
       username: userData.username,
       password: hashedPassword,
-      idRole: userData.idRole
+      idRole: userData.idRole,
+      idCustomer: userData.idCustomer
     });
   }
 

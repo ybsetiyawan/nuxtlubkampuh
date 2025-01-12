@@ -191,6 +191,20 @@
       <v-container fluid class="pa-1">
         <Nuxt />
       </v-container>
+
+      <!-- Dialog Session Berakhir -->
+      <v-dialog v-model="sessionExpired" max-width="400">
+        <v-card>
+          <v-card-title class="text-h5">Session Expired</v-card-title>
+          <v-divider></v-divider>
+          <v-card-text>
+            Session anda telah berakhir. Silahkan login kembali.
+          </v-card-text>
+          <v-card-actions>
+            <v-btn color="primary" text @click="handleSessionEnd">OK</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-main>
     
     <v-footer
@@ -203,7 +217,7 @@
 </template>
 
 <script>
-import { mapGetters, } from 'vuex';
+import { mapGetters, mapState, mapActions} from 'vuex';
 
 export default {
   middleware: 'auth',
@@ -240,6 +254,7 @@ export default {
   },
   computed: {
     ...mapGetters(['items','isAuthenticated', 'loading']),
+    ...mapState(['sessionExpired']),
 
 
     avatar() {
@@ -270,6 +285,12 @@ export default {
    
   },
   methods: {
+    handleSessionEnd() {
+      this.$store.commit('setSessionExpired', false);
+      this.$store.dispatch('logout');
+
+    },
+
     async fetchMenuItems() {
       try {
         await this.$store.dispatch('fetchMenuItems');
@@ -299,6 +320,8 @@ export default {
     handleProfile() {
       this.$router.push("/pengaturan/user/profile");
     },
+
+
   },
 };
 </script>

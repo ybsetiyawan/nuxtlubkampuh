@@ -50,7 +50,7 @@ class UserController {
 
   async createUser(req, res) {
     try {
-      const { nama, username, password, idRole } = req.body;
+      const { nama, username, password, idRole, idCustomer } = req.body;
 
       if (!nama || !username || !password || !idRole) {
         return res
@@ -63,6 +63,7 @@ class UserController {
         username,
         password,
         idRole,
+        idCustomer
       });
       res.status(201).json(newUser);
     } catch (error) {
@@ -118,7 +119,7 @@ class UserController {
       // Cari pengguna berdasarkan username
       const user = await UserService.getUserByUsername(username);
       if (!user) {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(404).json({ code: "INVALID_CREDENTIALS", message: "Invalid Credential" });
       }
 
       // Verifikasi password
@@ -127,7 +128,7 @@ class UserController {
         user.password
       );
       if (!isPasswordValid) {
-        return res.status(401).json({ message: "Invalid password" });
+        return res.status(401).json({ code: "INVALID_CREDENTIALS", message: "Invalid Credential" });
       }
 
       // Buat token JWT dengan payload tambahan
@@ -138,7 +139,7 @@ class UserController {
           nama: user.nama,
         },
         process.env.JWT_SECRET,
-        { expiresIn: "10h" }
+        { expiresIn: "10s" }
       );
 
       // Susun data respons seperti yang diminta

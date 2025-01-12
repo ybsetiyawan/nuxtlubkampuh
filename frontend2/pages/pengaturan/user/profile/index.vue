@@ -87,7 +87,7 @@
               >
             </v-toolbar>
             <v-divider></v-divider>
-            <v-card-text>
+            <v-card-text v-if="dataCustomer.kodeCustomer">
               <table class="dt-profile">
                 <tbody>
                   <tr>
@@ -122,6 +122,9 @@
                   </tr>
                 </tbody>
               </table>
+            </v-card-text>
+            <v-card-text v-else>
+              <v-alert type="error">Data customer tidak ditemukan!</v-alert>
             </v-card-text>
           </v-card>
         </v-col>
@@ -267,12 +270,11 @@ export default{
             showPassLama: false,
             showPass: false,
             dataCustomer: this.$cookies.get('user'), 
-
-    
         }
     },
 
     methods: {
+
     
         closePassword() {
             this.oldPassword = ""
@@ -284,19 +286,18 @@ export default{
         },
 
         async savePassword() {
-      try {
-        const token = this.$cookies.get(this.$config.tokenKey); // Mendapatkan token autentikasi
+        try {
+          const token = this.$cookies.get(this.$config.tokenKey); // Mendapatkan token autentikasi
+          // Langkah 1: Gunakan Endpoint Login untuk Verifikasi Password Lama
+          const verifyPayload = {
+            id: this.dataCustomer.id, // Gunakan ID user sebagai pengganti username
+            password: this.oldPassword, // Password lama untuk verifikasi
+            username: this.dataCustomer.username
+          };
 
-        // Langkah 1: Gunakan Endpoint Login untuk Verifikasi Password Lama
-        const verifyPayload = {
-          id: this.dataCustomer.id, // Gunakan ID user sebagai pengganti username
-          password: this.oldPassword, // Password lama untuk verifikasi
-          username: this.dataCustomer.username
-        };
-
-        const verifyResponse = await api.post(
-          '/api/users/login',  // Gunakan endpoint login yang ada
-          verifyPayload
+          const verifyResponse = await api.post(
+            '/api/users/login',  // Gunakan endpoint login yang ada
+            verifyPayload
         );
 
         if (verifyResponse.status === 200) {
@@ -313,68 +314,36 @@ export default{
           );
 
           if (updateResponse.status === 200) {
+            this.$root.$emit("start-loading"); // Mulai loading
+            await new Promise((resolve) => setTimeout(resolve, 1000)); // Tambahkan penundaan 1 detik
             this.$toast.fire({
               icon: 'success',
-              title: 'Password berhasil diperbarui', // Pesan sukses
+              title: 'Password berhasil diperbarui, silahkan login kembali', // Pesan sukses
             });
             this.closePassword(); // Tutup dialog setelah berhasil
+            this.$store.dispatch('logout');
+
           }
         }
       } catch (error) {
+        this.$root.$emit("start-loading"); // Mulai loading
         // console.error('Error Save data:', error);
         this.$toast.fire({
           icon: 'error',
           title: 'Password Lama tidak sesuai', // Pesan error
         });
+      } finally {
+        this.$root.$emit("stop-loading"); // Selesai loading
       }
     },
 
-
-
-        // async savePassword() {
-        //   try {
-        //     // const token = this.$cookies.get(this.$config.tokenKey);
-
-        //     const payload = {
-        //       oldPassword: this.oldPassword,
-        //       newPassword: this.newPassword,
-        //       id: this.dataCustomer.id,
-        //       isDeleted: false,
-        //     };
-        //     console.log('Data Add', payload);
-
-        //     // Directly call the API to update the password
-        //     // const apiCall = api.put(`/api/users/${this.dataCustomer.id}`, payload, {
-        //     //   headers: { Authorization: `Bearer ${token}` },
-        //     // });
-
-        //     // await apiCall;
-        //     // this.closePassword(); // Close the password dialog
-
-        //     // this.$toast.fire({
-        //     //   icon: 'success',
-        //     //   title: 'Password berhasil diperbarui', // Success message
-        //     // });
-        //   } catch (error) {
-        //     console.error('Error Save data:', error);
-        //     this.$toast.fire({
-        //       icon: 'error',
-        //       title:
-        //         error.response?.data?.message || 'Gagal Ubah Password',
-        //     });
-        //   } finally {
-        //     this.loading = false;
-        //   }
-        // },
         
-        validateAndSavePassword() {
-            this.$refs.formPass.validate(); // Memvalidasi form
-            if (this.$refs.formPass.validate()) {
-                this.savePassword(); // Panggil metode savePassword jika validasi berhasil
-            }
-        },
-
-        
+      validateAndSavePassword() {
+          this.$refs.formPass.validate(); // Memvalidasi form
+          if (this.$refs.formPass.validate()) {
+              this.savePassword(); // Panggil metode savePassword jika validasi berhasil
+          }
+      },
     }
 }
 </script>

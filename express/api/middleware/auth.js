@@ -9,7 +9,7 @@ const verifyToken = (req, res, next) => {
 
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
-      return res.status(401).json({ message: "Unauthorized!" });
+      return res.status(401).json({ code : "TOKEN_EXPIRED", message: "Unauthorized!" });
     }
     req.userId = decoded.userId; // Simpan userId dari token ke dalam request
     next();

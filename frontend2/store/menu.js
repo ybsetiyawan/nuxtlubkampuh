@@ -15,9 +15,9 @@ export const fetchMenuItems = async (idRole, token) => {
   } catch (error) {
     console.error('Error fetching menu items:', error);
     if (error.response) {
-      console.error('Response data:', error.response.data);
-      console.error('Response status:', error.response.status);
-      console.error('Response headers:', error.response.headers);
+      // console.error('Response data:', error.response.data);
+      // console.error('Response status:', error.response.status);
+      // console.error('Response headers:', error.response.headers);
     }
     throw error; // Lempar error agar bisa ditangani di tempat lain
   }

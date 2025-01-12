@@ -57,11 +57,11 @@ export default {
       menuItems: [],
       menuHeaders: [
         { text: 'No', value: 'no', width: '68px', sortable: false },
-        { text: 'Kode', value: 'kode', sortable: false },
+        { text: 'Kode', value: 'kode', width: '110px',sortable: false },
         { text: 'User', value: 'user', sortable: false }, 
         { text: 'Username', value: 'username', sortable: false }, 
         { text: 'Role', value: 'role', sortable: false },
-        { text: 'Cust cd', value: 'kode_customer', sortable: false },
+        { text: 'Cust Kode', value: 'kode_customer', sortable: false },
       ],
       dialog: false,
       dialogTitle: '',
@@ -125,6 +125,9 @@ export default {
       },
       isEditMode: false, // Tambahkan ini
       roleOptions: [],
+      customerOptions: [],
+      listCustomer: [],
+
     };
   },
   methods: {
@@ -136,6 +139,29 @@ export default {
         roleField.options = this.roleOptions; // Atur options dengan roleOptions
       }
     },
+
+    async updateCustomerOptions() {
+      try {
+        // Ambil token dari cookies
+        const token = this.$cookies.get(this.$config.tokenKey);
+        // Panggil fetchCustomer dengan konfigurasi header
+        this.customerOptions = await this.$fetchCustomer({
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Cari field dengan value 'customer' di formFields
+        const field = this.formFields.find((field) => field.value === 'customer');
+        if (field) {
+          // Update options untuk field customer
+          field.options = this.customerOptions;
+        }
+      } catch (error) {
+        console.error('Gagal memperbarui opsi customer:', error);
+      }
+    },
+
 
     async fetchData(filter) {
       const token = this.$cookies.get(this.$config.tokenKey);
@@ -164,6 +190,7 @@ export default {
           username: formData.username,
           password: formData.password,
           idRole: formData.role,
+          idCustomer: formData.customer,
           isDeleted: false,
         };
         console.log('Data Add', payload);
@@ -251,6 +278,7 @@ export default {
       };
       this.dialog = true;
       this.updateRoleOptions();
+      this.updateCustomerOptions();
     },
 
     closeDialog() {
@@ -265,10 +293,13 @@ export default {
         user: item.user || '',
         username: item.username || '',
         password: item.password || '',
-        id_role: item.role || '',
+        idRole: item.role || '',
+        idCustomer: item.customer || '',
       };
       this.dialog = true;
       this.updateRoleOptions();
+      this.updateCustomerOptions();
+
 
     },
   },

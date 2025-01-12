@@ -11,16 +11,14 @@ export const state = () => ({
   idRole: null,
   // nama: null,
   items: [],
-  loading: false
+  loading: false,
+  sessionExpired: false
 });
 
 export const mutations = {
   setToken(state, token) {
     state.token = token;
   },
-  // setUser(state, user) {
-  //   state.user = user;
-  // },
   clearAuth(state) {
     state.token = null;
     state.user = null;
@@ -31,12 +29,13 @@ export const mutations = {
   setItems(state, items) {
     state.items = items;
   },
-  // setNama(state, nama) {
-  //   state.nama = nama;
-  // },
+  
   setLoading(state, value) {
     state.loading = value
-  }
+  },
+  setSessionExpired(state, value) {
+    state.sessionExpired = value;
+  },
 };
 
 export const getters = {
@@ -67,8 +66,8 @@ export const actions = {
     const token = cookies[this.$config.tokenKey] || null; // Ambil token dengan kunci yang benar
     commit('setToken', token);
     commit('setIdRole', cookies.idRole || null);
-    // commit('setNama', cookies.nama || null);
   },
+  
 
   //Pengguna melakukan login melalui action login di store/index.js. Setelah login berhasil,
   //token dan idRole disimpan di state Vuex.
@@ -82,56 +81,37 @@ export const actions = {
     
     commit('setToken', token.AccessToken);
     this.$cookies.set(this.$config.tokenKey, token.AccessToken);
-    
-    // commit('setUser', user);
     commit('setIdRole', user.idRole);
     this.$cookies.set('idRole', user.idRole);
-    // commit('setNama', user.nama);
-    // this.$cookies.set('nama', user.nama);
     this.$cookies.set('kode', user.role.kode);
-    // commit('setUserData', user);
     this.$cookies.set('user', user);
 
   },
 
-  async logout({ commit }) {
-    commit('clearAuth');
-    this.$cookies.remove(this.$config.tokenKey)
-    this.$cookies.remove('idRole');
-    // this.$cookies.remove('nama');
-    this.$cookies.remove('kode');
-    this.$cookies.remove('user');
-    this.$router.push('/login');
-  },
-
-  async fetchMenuItems({ state, commit }) {
+  async fetchMenuItems({ state, commit, dispatch }) {
     try {
       const items = await fetchMenuItems(state.idRole, state.token);
       commit('setItems', items);
-  
-      // if (items && items.length > 0) {
-      //   const links = [];
-      //   for (const item of items) {
-      //     if (item.link !== "#") {
-      //       links.push(item.link);
-      //     }
-      //     if (item.children) {
-      //       for (const child of item.children) {
-      //         if (child.link !== "#") {
-      //           links.push(child.link);
-      //         }
-      //       }
-      //     }
-      //   }
-      //   // commit('setLinks', JSON.stringify(links));
-      //   this.$cookies.set('links',links);
-
-
-      // }
-  
     } catch (error) {
-      console.error('Failed to fetch menu items in store:', error);
-    }
-  }
+      // if (error.response && error.response.status === 401) {
+      //   console.warn('Unauthorized, showing session expired dialog...');
+      //   commit('setSessionExpired', true);
+      // }
+    }
+  },
+
+  async logout({ commit }) {
+    commit('clearAuth');
+    this.$cookies.remove(this.$config.tokenKey);
+    this.$cookies.remove('idRole');
+    this.$cookies.remove('kode');
+    this.$cookies.remove('user');
+    if (process.client) {
+      this.$router.push('/login'); // Redirect ke halaman login
+    }
+  },
+
+
+  
   
 };
