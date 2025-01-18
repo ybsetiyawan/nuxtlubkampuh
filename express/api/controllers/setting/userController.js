@@ -139,7 +139,7 @@ class UserController {
           nama: user.nama,
         },
         process.env.JWT_SECRET,
-        { expiresIn: "10s" }
+        { expiresIn: "5h" }
       );
 
       // Susun data respons seperti yang diminta

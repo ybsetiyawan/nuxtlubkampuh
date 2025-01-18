@@ -1,13 +1,13 @@
 const pool = require("../../config/db");
 const { v4: uuidv4 } = require("uuid");
 
-class RolesRepository {
-  async getAllRoles() {
-    const res = await pool.query("SELECT * FROM c_role where is_deleted = false");
+class MaterialRepository {
+  async getAllMaterial() {
+    const res = await pool.query("SELECT * FROM c_material where is_deleted = false");
     return res.rows;
   }
 
-  async resolveAllRoles({ pageSize, pageNumber, q, sortBy, sortType }) {
+  async resolveAllMaterial({ pageSize, pageNumber, q, sortBy, sortType }) {
     const conditions = [];
     const values = [];
 
@@ -24,7 +24,7 @@ class RolesRepository {
 
     let query = `
         SELECT id, kode, nama, created_at, is_deleted 
-        FROM c_role
+        FROM c_material
         WHERE is_deleted = false
     `;
 
@@ -53,47 +53,47 @@ class RolesRepository {
     // Dapatkan total item tanpa limit dan offset
     const countQuery = `
         SELECT COUNT(*) 
-        FROM c_role
+        FROM c_material
         WHERE is_deleted = false
         ${conditions.length > 0 ? " AND " + conditions.join(" AND ") : ""}
     `;
     const countResult = await pool.query(countQuery, values.slice(0, -2)); // Menghapus limit dan offset dari values
     const totalItems = parseInt(countResult.rows[0].count, 10);
 
-    return { users: result.rows, totalItems };
+    return { material: result.rows, totalItems };
   }
 
-  async getRolesById(id) {
-    const res = await pool.query("SELECT * FROM c_role WHERE id = $1", [id]);
+  async getMaterialById(id) {
+    const res = await pool.query("SELECT * FROM c_material WHERE id = $1", [id]);
     return res.rows[0];
   }
 
-  async createRoles(role) {
+  async createMaterial(material) {
     // Generate UUID
     const id = uuidv4();
 
     const res = await pool.query(
-      "INSERT INTO c_role (id, kode, nama, created_by) VALUES ($1, $2, $3, $4) RETURNING *",
-      [id, role.kode, role.nama, role.createdBy]
+      "INSERT INTO c_material (id, kode, nama, created_by) VALUES ($1, $2, $3, $4) RETURNING *",
+      [id, material.kode, material.nama, material.createdBy]
     );
     return res.rows[0];
   }
 
-  async updateRoles(id, role) {
+  async updateMaterial(id, material) {
     const res = await pool.query(
-      "UPDATE c_role SET kode = $1, nama = $2, updated_by = $3, updated_at = now() WHERE id = $4 RETURNING *",
-      [role.kode, role.nama, role.updatedBy, id]
+      "UPDATE c_material SET kode = $1, nama = $2,updated_by = $3, updated_at = now() WHERE id = $4 RETURNING *",
+      [material.kode, material.nama, material.updatedBy, id]
     );
     return res.rows[0];
   }
 
-  async deleteRoles(id, updatedBy) {
+  async deleteMaterial(id, updatedBy) {
     const res = await pool.query(
-      "UPDATE c_role SET is_deleted = true,  updated_at = now(), updated_by = $2 WHERE id = $1  RETURNING *",
+      "UPDATE c_material SET is_deleted = true,  updated_at = now(), updated_by = $2 WHERE id = $1  RETURNING *",
       [id, updatedBy]
     );
     return res.rows[0];
   }
 }
 
-module.exports = new RolesRepository();
+module.exports = new MaterialRepository();

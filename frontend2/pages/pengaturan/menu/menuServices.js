@@ -4,27 +4,30 @@ import api from "~/service/api";
 export default {
     created() {
         this.fetchData();
+        // this.fetchData2();
         this.fetchRole();
     },
 
     methods: {
-        // TAB MENU
-        async fetchData(filter) {
+        // untuk menampilkan data menu di TAB MENU dengan parameter 8 pages
+        async fetchData(filter = null) {
             const token = this.$cookies.get(this.$config.tokenKey);
             await new Promise((resolve) => setTimeout(resolve, 1000));
             try {
               const response = await api.get('/api/menu', {
                 headers: { Authorization: `Bearer ${token}` },
-                params: filter,
+                params: filter ? { ...filter } : undefined,
               });
-              const menus = response.data.data.items;
-              this.list_menu = menus;
-              return response
-    
+              if (!filter) {
+                this.list_menu = response.data.data.items;
+              }
+              return response;
             } catch (error) {
               console.error('Gagal ambil data menu:', error);
             }
           },
+
+         
 
           transformResponse(response) {
             return {
@@ -148,15 +151,15 @@ export default {
             const response = await api.get('/api/roles');
             const roles = response.data.data;
             this.listRole = roles;
-            console.log('Role Data:', roles);
-            const roleOptions = roles.map((role) => ({
-              text: role.nama, // Ubah sesuai dengan nama field yang mewakili nama peran
-              value: role.id,  // Ubah sesuai dengan id atau kode unik peran
-            }));
-            const roleField = this.formFields2.find((field) => field.value === 'role');
-              if (roleField) {
-              roleField.options = roleOptions;
-            }
+            // console.log('Role Data:', roles);
+            // const roleOptions = roles.map((role) => ({
+            //   text: role.nama, // Ubah sesuai dengan nama field yang mewakili nama peran
+            //   value: role.id,  // Ubah sesuai dengan id atau kode unik peran
+            // }));
+            // const roleField = this.formFields2.find((field) => field.value === 'role');
+            //   if (roleField) {
+            //   roleField.options = roleOptions;
+            // }
       
             }catch (error) {
             console.error('Gagal mengambil data role:', error);

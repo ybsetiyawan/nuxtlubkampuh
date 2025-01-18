@@ -1,8 +1,8 @@
-const RolesService = require("../../services/setting/roleService");
+const MaterialService = require("../../services/master/materialService");
 
-class RolesController {
+class MaterialController {
 
-  async resolveAllRoles(req, res) {
+  async resolveAllMaterial(req, res) {
       try {
         const filters = {
           pageSize: parseInt(req.query.pageSize, 10) || 30,
@@ -12,7 +12,7 @@ class RolesController {
           sortType: req.query.sortType || "ASC",
         };
   
-        const { users, totalItems } = await RolesService.resolveAllRoles(filters);
+        const { material, totalItems } = await MaterialService.resolveAllMaterial(filters);
   
         const totalPage = Math.ceil(totalItems / filters.pageSize);
         const currentPage = filters.pageNumber;
@@ -21,7 +21,7 @@ class RolesController {
   
         const response = {
           data: {
-            items: users.map((item) => ({
+            items: material.map((item) => ({
               id: item.id,
               kode: item.kode,
               nama: item.nama,
@@ -49,65 +49,64 @@ class RolesController {
     }
 
 
-  async getAllRoles(req, res) {
+  async getAllMaterial(req, res) {
     try {
-      const roles = await RolesService.getAllRoles();
-      res.json({ data: roles });
+      const material = await MaterialService.getAllMaterial();
+      res.json({ data: material });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   }
 
-  async getRolesById(req, res) {
+  async getMaterialById(req, res) {
     try {
-      const role = await RolesService.getRolesById(req.params.id);
-      if (!role) {
-        return res.status(404).json({ message: "Role not found" });
+      const material = await MaterialService.getMaterialById(req.params.id);
+      if (!material) {
+        return res.status(404).json({ message: "Material not found" });
       }
-      res.json(role);
+      res.json(material);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   }
 
-  async createRole(req, res) {
+  async createMaterial(req, res) {
     try {
-      const newRole = await RolesService.createRoles(req.body);
-      res.status(201).json(newRole);
+      const newMaterial = await MaterialService.createMaterial(req.body);
+      res.status(201).json(newMaterial);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   }
 
-  async updateRole(req, res) {
+  async updateMaterial(req, res) {
     try {
-      const updatedRole = await RolesService.updateRoles(
+      const updatedMaterial = await MaterialService.updateMaterial(
         req.params.id,
         req.body
       );
-      res.json(updatedRole);
+      res.json(updatedMaterial);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   }
 
-  async deleteRoles(req, res) {
-    try {
-      const { id } = req.params;
-      const { updatedBy } = req.query; // Ambil updatedBy dari query parameter
-  
-      if (!updatedBy) {
-        return res.status(400).json({ message: 'updatedBy is required' });
+  async deleteMaterial(req, res) {
+      try {
+        const { id } = req.params;
+        const { updatedBy } = req.query; // Ambil updatedBy dari query parameter
+    
+        if (!updatedBy) {
+          return res.status(400).json({ message: 'updatedBy is required' });
+        }
+    
+        const deletedMaterial = await MaterialService.deleteMaterial(id, updatedBy);
+        res.json(deletedMaterial);
+      } catch (error) {
+        res.status(500).json({ message: error.message });
       }
-  
-      const deletedRole = await RolesService.deleteRoles(id, updatedBy);
-      res.json(deletedRole);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
     }
-  }
-
   
 }
 
-module.exports = new RolesController();
+module.exports = new MaterialController();

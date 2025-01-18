@@ -2,6 +2,7 @@
 import Vue from 'vue'
 import api from '@/service/api';
 
+
 export const fetchCustomer = async (config = {}) => {
   try {
     const response = await api.get('/api/customer', config);

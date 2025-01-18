@@ -4,8 +4,8 @@
         ref="dataTable"
         :headers="menuHeaders"
         :items="menuItems"
-        title="Data Role"
-        searchTitle="Cari Role"
+        title="Data Material"
+        searchTitle="Cari Material"
         :meta="meta"
         :fetch-data="fetchData"
         :transform-response="transformResponse"
@@ -100,7 +100,7 @@
   
       async fetchData(filter) {
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        return await api.get('/api/roles/all', {
+        return await api.get('/api/material/all', {
           params: filter,
         });
       },
@@ -117,27 +117,24 @@
         try {
           const token = this.$cookies.get(this.$config.tokenKey);
           const isEdit = this.edit.id;
-  
           const payload = {
             kode: formData.kode,
             nama: formData.nama,
           };
-
           if (isEdit) {
               payload.updatedBy = this.dataUser.id;
             } else {
               payload.createdBy = this.dataUser.id;
             }
-
           console.log('Data Add', payload);
-  
+
           let apiCall;
           if (isEdit) {
-            apiCall = api.put(`/api/roles/${this.edit.id}`, payload, {
+            apiCall = api.put(`/api/material/${this.edit.id}`, payload, {
               headers: { Authorization: `Bearer ${token}` },
             });
           } else {
-            apiCall = api.post(`/api/roles`, payload, {
+            apiCall = api.post(`/api/material`, payload, {
               headers: { Authorization: `Bearer ${token}` },
             });
           }
@@ -168,42 +165,36 @@
       async deleteItem(data) {
         try {
           // Menyesuaikan tampilan dialog konfirmasi dengan tema dark
+          console.log(data)
           const result = await this.$showConfirmationDialog();
-
+  
+  
           if (result.isConfirmed) {
-            console.log('Data yang akan dihapus:', data); // Log data yang akan dihapus
             const token = this.$cookies.get(this.$config.tokenKey);
-
-            const response = await api.delete(
-              `/api/roles/${data.id}?updatedBy=${this.dataUser.id}`, 
-              {
-                headers: { Authorization: `Bearer ${token}` },
-              }
-            );
-
-            console.log('Response setelah delete:', response); // Log respons dari server
-
+            await api.delete(`/api/material/${data.id}?updatedBy=${this.dataUser.id}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+  
             this.closeDialog();
-
             if (this.$refs.dataTable) {
-              await this.$refs.dataTable.loadData();
-            }
-
+            await this.$refs.dataTable.loadData();
+          }
             this.$toast.fire({
               icon: 'success',
               title: 'Data berhasil dihapus',
             });
           }
-        } catch (error) {
+          } catch (error) {
           console.error('Error Delete data:', error);
-          console.log('Detail Error:', error.response?.data || error.message); // Log detail error jika ada
           this.$toast.fire({
-            icon: 'error',
-            title: error.response?.data?.message || 'Gagal menghapus data',
-          });
-        }
+          icon: 'error',
+          title: error.response?.data?.message || 'Gagal menghapus data',
+            });
+          }
       },
 
+      
+  
       transformResponse(response) {
         return {
           items: response.data.data.items,

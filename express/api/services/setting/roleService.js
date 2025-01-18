@@ -23,8 +23,8 @@ class RolesService {
     return RolesRepository.updateRoles(id, rolesData);
   }
 
-  deleteRoles(id) {
-    return RolesRepository.deleteRoles(id);
+  deleteRoles(id, rolesData) {
+    return RolesRepository.deleteRoles(id, rolesData);
   }
 }
 

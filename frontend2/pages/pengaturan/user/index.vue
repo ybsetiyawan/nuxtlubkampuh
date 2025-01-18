@@ -57,7 +57,7 @@ export default {
       menuItems: [],
       menuHeaders: [
         { text: 'No', value: 'no', width: '68px', sortable: false },
-        { text: 'Kode', value: 'kode', width: '110px',sortable: false },
+        { text: 'Role Kode', value: 'kode', width: '110px',sortable: false },
         { text: 'User', value: 'user', sortable: false }, 
         { text: 'Username', value: 'username', sortable: false }, 
         { text: 'Role', value: 'role', sortable: false },

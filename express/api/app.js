@@ -3,12 +3,18 @@ const express = require("express");
 // MASTER
 const employeeRoutes = require("./routes/master/employeeRoutes");
 const customerRoutes = require("./routes/master/customerRoutes");
+const materialRoutes = require("./routes/master/materialRoutes");
 
 // SETTING
 const userRoutes = require("./routes/setting/userRoutes");
 const roleRoutes = require("./routes/setting/roleRoutes");
 const menuRoutes = require("./routes/setting/menuRoutes");
 const menuUserRoutes = require("./routes/setting/menuUserRoutes");
+
+// TRANSAKSI
+const DeliveryRoutes = require("./routes/transaksi/deliveryRoutes");
+
+
 const cors = require("cors");
 require("dotenv").config();
 
@@ -41,5 +47,7 @@ app.use("/api/roles", roleRoutes);
 app.use("/api/menu", menuRoutes);
 app.use("/api/menu-user", menuUserRoutes);
 app.use("/api/customer", customerRoutes);
+app.use("/api/material", materialRoutes);
+app.use("/api/delivery", DeliveryRoutes);
 
 module.exports = app;
