@@ -63,12 +63,43 @@ class DeliveryRepositories {
   }
 
   async getDeliveryId(id) {
-    const res = await pool.query("SELECT * FROM t_delivery WHERE id = $1", [id]);
+    const res = await pool.query(`
+      SELECT 
+        d.id AS delivery_id,
+        d.doc_no,
+        d.tanggal_kirim,
+        d.id_customer,
+        d.keterangan,
+        d.is_status,
+        d.created_by,
+        d.created_at,
+        d.updated_by,
+        d.updated_at,
+        json_agg(
+          json_build_object(
+            'id_detail', dd.id,
+            'id_material', dd.id_material,
+            'kode_material', m.kode,
+            'nama_material', m.nama,
+            'qty', dd.qty
+          )
+        ) AS details
+      FROM t_delivery d
+      LEFT JOIN t_delivery_detail dd ON d.id = dd.id_delivery
+      LEFT JOIN c_material m ON dd.id_material = m.id
+      WHERE d.id = $1
+      GROUP BY d.id
+    `, [id]);
+  
     return res.rows[0];
   }
+  
 
   async createDeliveryWithDetails(delivery, details) {
     const id = uuidv4(); // Membuat UUID baru untuk pengiriman
+    if (!delivery.idCustomer) {
+      throw new Error("Anda tidak terdaftar sebagai customer");
+    }
   
     const client = await pool.connect(); // Mulai transaksi
     try {
@@ -129,30 +160,66 @@ class DeliveryRepositories {
   // }
 
   async updateDelivery(id, delivery) {
-    const query = `
-      UPDATE t_delivery 
-      SET doc_no = $1, 
-          tanggal_kirim = $2, 
-          id_customer = $3, 
-          keterangan = $4, 
-          is_status = $5, 
-          updated_by = $6, 
-          updated_at = now()
-      WHERE id = $7 
-      RETURNING *
-    `;
-    const values = [
-      delivery.docNo,
-      delivery.tanggalKirim,
-      delivery.idCustomer,
-      delivery.keterangan,
-      delivery.isStatus,
-      delivery.updatedBy,
-      id,
-    ];
-    const res = await pool.query(query, values);
-    return res.rows[0];
+    // Mulai transaksi
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN'); // Memulai transaksi
+  
+      // Query untuk memperbarui t_delivery
+      const queryDelivery = `
+        UPDATE t_delivery 
+        SET doc_no = $1, 
+            tanggal_kirim = $2, 
+            id_customer = $3, 
+            keterangan = $4, 
+            is_status = $5, 
+            updated_by = $6, 
+            updated_at = now()
+        WHERE id = $7 
+        RETURNING *
+      `;
+      const valuesDelivery = [
+        delivery.docNo,
+        delivery.tanggalKirim,
+        delivery.idCustomer,
+        delivery.keterangan,
+        delivery.isStatus,
+        delivery.updatedBy,
+        id,
+      ];
+  
+      // Eksekusi query untuk update t_delivery
+      const resDelivery = await client.query(queryDelivery, valuesDelivery);
+  
+      // Pembaruan untuk t_delivery_detail
+      const queryDetail = `
+        UPDATE t_delivery_detail
+        SET qty = $1
+        WHERE id = $2 AND delivery_id = $3
+        RETURNING *
+      `;
+  
+      for (let detail of delivery.details) {
+        const valuesDetail = [detail.qty, detail.idDetail, id];
+        await client.query(queryDetail, valuesDetail);
+      }
+  
+      // Commit transaksi jika semua query berhasil
+      await client.query('COMMIT');
+      
+      // Kembalikan hasil update pengiriman
+      return resDelivery.rows[0];
+    } catch (error) {
+      // Rollback jika terjadi kesalahan
+      await client.query('ROLLBACK');
+      console.error("Error updating delivery:", error);
+      throw error; // Lempar ulang error untuk penanganan lebih lanjut
+    } finally {
+      client.release(); // Pastikan koneksi dilepaskan
+    }
   }
+  
+  
   
 
   async deleteDelivery(id, updatedBy) {

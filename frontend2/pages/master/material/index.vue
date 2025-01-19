@@ -62,7 +62,7 @@
         ],
         dialog: false,
         dialogTitle: '',
-        loading: false,
+        // loading: false,
         formFields: [
   
           {
@@ -113,7 +113,7 @@
             });
             return
         }
-        this.loading = true;
+        // this.loading = true;
         try {
           const token = this.$cookies.get(this.$config.tokenKey);
           const isEdit = this.edit.id;
@@ -158,7 +158,7 @@
               error.response?.data?.message || 'Gagal menambahkan data',
           });
         } finally {
-          this.loading = false;
+          // this.loading = false;
         }
       },
   
