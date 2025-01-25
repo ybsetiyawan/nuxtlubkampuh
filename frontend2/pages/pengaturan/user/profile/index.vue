@@ -327,6 +327,7 @@ export default{
         }
       } catch (error) {
         this.$root.$emit("start-loading"); // Mulai loading
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Tambahkan penundaan 1 detik
         // console.error('Error Save data:', error);
         this.$toast.fire({
           icon: 'error',

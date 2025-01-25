@@ -51,8 +51,11 @@ class DeliveryController {
 
   async getAllDelivery(req, res) {
     try {
-      const deliveries = await DeliveryService.getAllDelivery();
-      res.json({ data: deliveries });
+      const delivery = await DeliveryService.getAllDelivery();
+      if (!delivery) {
+        return res.status(404).json({ message: "Delivery not found" });
+      }
+      res.json(delivery);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -61,6 +64,18 @@ class DeliveryController {
   async getDeliveryById(req, res) {
     try {
       const delivery = await DeliveryService.getDeliveryById(req.params.id);
+      if (!delivery) {
+        return res.status(404).json({ message: "Delivery not found" });
+      }
+      res.json(delivery);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async getDeliveryByIdCustomer(req, res) {
+    try {
+      const delivery = await DeliveryService.getDeliveryByIdCustomer(req.params.id);
       if (!delivery) {
         return res.status(404).json({ message: "Delivery not found" });
       }

@@ -3,8 +3,8 @@ import colors from "vuetify/es5/util/colors";
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: "%s - lubujinunxtjs",
-    title: "lubujinunxtjs",
+    titleTemplate: "%s - Lab Uji Bahan Kampuh Indonesia",
+    title: "Aplikasi",
     htmlAttrs: {
       lang: "en",
     },
@@ -24,6 +24,7 @@ export default {
   plugins: [
     { src: "~/plugins/sweetalert.js", mode: "client" },
     { src: "~/plugins/loading.js", mode: "client", ssr: false },
+    { src: "~/plugins/formatDate.js", mode: "client", ssr: false },
   ],
 
   // router: {

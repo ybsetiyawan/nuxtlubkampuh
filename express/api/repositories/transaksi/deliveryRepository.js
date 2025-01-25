@@ -3,8 +3,41 @@ const { v4: uuidv4 } = require("uuid");
 
 class DeliveryRepositories {
   async getAllDelivery() {
-    const res = await pool.query("SELECT * FROM t_delivery where is_deleted = false");
+    // const res = await pool.query("SELECT * FROM t_delivery where is_deleted = false");
+    // return res.rows;
+
+    const res = await pool.query(`
+      SELECT 
+      d.id,
+      d.doc_no,
+      d.tanggal_kirim,
+      d.id_customer,
+      c.nama AS nama_customer,
+      d.keterangan,
+      d.is_status,
+      d.created_by,
+      d.created_at,
+      d.updated_by,
+      d.updated_at,
+      json_agg(
+        json_build_object(
+          'id_detail', dd.id,
+          'id_material', dd.id_material,
+          'kode_material', m.kode,
+          'nama_material', m.nama,
+          'qty', dd.qty
+        )
+      ) AS details
+    FROM t_delivery d
+    LEFT JOIN t_delivery_detail dd ON d.id = dd.id_delivery
+    LEFT JOIN c_material m ON dd.id_material = m.id
+    LEFT JOIN m_customer c ON d.id_customer = c.id
+    GROUP BY d.id, c.nama
+    ORDER BY 
+    d.created_at DESC;`)
+  
     return res.rows;
+    
   }
 
   async resolveAllDelivery({ pageSize, pageNumber, q, sortBy, sortType }) {
@@ -65,10 +98,11 @@ class DeliveryRepositories {
   async getDeliveryId(id) {
     const res = await pool.query(`
       SELECT 
-        d.id AS delivery_id,
+        d.id,
         d.doc_no,
         d.tanggal_kirim,
         d.id_customer,
+        c.nama AS nama_customer,  -- Menambahkan nama customer
         d.keterangan,
         d.is_status,
         d.created_by,
@@ -87,12 +121,51 @@ class DeliveryRepositories {
       FROM t_delivery d
       LEFT JOIN t_delivery_detail dd ON d.id = dd.id_delivery
       LEFT JOIN c_material m ON dd.id_material = m.id
-      WHERE d.id = $1
-      GROUP BY d.id
+      LEFT JOIN m_customer c ON d.id_customer = c.id  -- Menambahkan join ke c_customer
+      WHERE d.id = $1 AND is_status = '1'
+      GROUP BY d.id, c.nama
     `, [id]);
   
     return res.rows[0];
   }
+
+  async getDeliveryByIdCustomer(id_customer) {
+    const res = await pool.query(`
+      SELECT 
+        d.id,
+        d.doc_no,
+        d.tanggal_kirim,
+        d.id_customer,
+        c.nama AS nama_customer,  -- Menambahkan nama customer
+        d.keterangan,
+        d.is_status,
+        d.created_by,
+        d.created_at,
+        d.updated_by,
+        d.updated_at,
+        d.is_deleted,
+        json_agg(
+          json_build_object(
+            'id_detail', dd.id,
+            'id_material', dd.id_material,
+            'kode_material', m.kode,
+            'nama_material', m.nama,
+            'qty', dd.qty
+          )
+        ) AS details
+      FROM t_delivery d
+      LEFT JOIN t_delivery_detail dd ON d.id = dd.id_delivery
+      LEFT JOIN c_material m ON dd.id_material = m.id
+      LEFT JOIN m_customer c ON d.id_customer = c.id  -- Menambahkan join ke c_customer
+      WHERE d.id_customer = $1 AND d.is_deleted = 'FALSE' 
+      GROUP BY d.id, c.nama  -- Pastikan menambahkan c.nama ke GROUP BY
+    `, [id_customer]);
+  
+    return res.rows;
+  }
+  
+
+  
   
 
   async createDeliveryWithDetails(delivery, details) {
@@ -195,7 +268,7 @@ class DeliveryRepositories {
       const queryDetail = `
         UPDATE t_delivery_detail
         SET qty = $1
-        WHERE id = $2 AND delivery_id = $3
+        WHERE id = $2 AND id_delivery = $3
         RETURNING *
       `;
   

@@ -11,21 +11,37 @@
           dense
           outlined
           hide-details
-          style="max-width: 300px;"
+          style="max-width: 350px;"
+          class="mr-2"
           @keyup.enter="searchDelivery"
         ></v-text-field>
+        
         <v-btn color="primary" @click="searchDelivery" :disabled="!deliveryId">
           <v-icon left>mdi-magnify</v-icon>Cari
         </v-btn>
       </v-card-title>
       <v-divider></v-divider>
+
+      <v-card-text>
+        <v-alert
+          v-if="items.length && searched"
+          type="warning"
+          dense
+          outlined
+          color="error"
+          class="mb-3"
+        >
+          Harap pastikan terlebih dahulu data pengiriman yang akan di update.
+        </v-alert>
+      </v-card-text>
+
       <v-card-text>
         <v-alert
           v-if="!items.length && searched"
           type="warning"
           dense
           outlined
-          color="orange"
+          color="error"
           class="mb-3"
         >
           Data pengiriman tidak ditemukan!
@@ -44,7 +60,7 @@
               outlined
               type="number"
               min="0"
-              style="max-width: 80px;"
+              style="max-width: 75px; height: 40px;"
             ></v-text-field>
           </template>
         </v-data-table>
@@ -57,7 +73,9 @@
         >
           <v-icon left>mdi-content-save</v-icon>Update Status
         </v-btn>
-        <v-btn text color="error" @click="resetForm">
+        <v-btn 
+          :disabled="!searched"
+          text color="error" @click="resetForm">
           <v-icon left>mdi-refresh</v-icon>Reset
         </v-btn>
       </v-card-actions>
@@ -75,39 +93,50 @@ export default {
       items: [],
       searched: false,
       headers: [
+        { text: "Tanggal", value: "tanggalKirim" },
+        { text: "Nama", value: "namaCustomer" },
         { text: "Kode", value: "kode_material" },
         { text: "Nama", value: "nama_material" },
         { text: "Qty Kirim", value: "qty" },
         { text: "Qty Fisik", value: "qtyPhysical" },
       ],
+      dataUser: this.$cookies.get('user'), 
     };
   },
   methods: {
-    async searchDelivery() {
-  if (!this.deliveryId) {
-    alert("Masukkan ID Pengiriman!");
-    return;
-  }
-  try {
-    const response = await api.get(`/api/delivery/${this.deliveryId}`);
-    // console.log('Response delivery:', response.data);
+  async searchDelivery() {
+    if (!this.deliveryId) {
+      alert("Masukkan ID Pengiriman!");
+      return;
+    }
+    try {
+      this.$root.$emit("start-loading"); // Mulai loading
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Tambahkan penundaan 1 detik
+      const response = await api.get(`/api/delivery/${this.deliveryId}`);
+      // console.log('Response delivery:', response.data);
 
-    // Ambil detail dari response.data.details
-    const delivery = response.data;
-    this.items = delivery.details.map((item) => ({
-      ...item,
-      qtyPhysical: item.qty, // Default qty fisik sama dengan qty kirim
-      docNo: delivery.doc_no, // Menambahkan docNo ke setiap item
-      idCustomer: delivery.id_customer,
-    }));
+      // Ambil detail dari response.data.details
+      const delivery = response.data;
+      this.items = delivery.details.map((item) => ({
+        ...item,
+        qtyPhysical: item.qty, // Default qty fisik sama dengan qty kirim
+        docNo: delivery.doc_no, // Menambahkan docNo ke setiap item
+        idCustomer: delivery.id_customer,
+        tanggalKirim: this.$formatDate(delivery.tanggal_kirim),
+        keterangan: delivery.keterangan,
+        namaCustomer: delivery.nama_customer,
+      }));
 
-    console.log('Data delivery items:', this.items);
-    this.searched = true;
-  } catch (error) {
-    console.error("Error fetching delivery:", error);
-    this.items = [];
-    this.searched = true;
-  }
+      console.log('Data delivery items:', this.items);
+      this.searched = true;
+    } catch (error) {
+      console.error("Error fetching delivery:", error);
+      this.items = [];
+      this.searched = true;
+    } finally {
+      this.$root.$emit("stop-loading"); // Mulai loading
+      
+    }
 },
 
 async updateStatus() {
@@ -120,52 +149,62 @@ async updateStatus() {
   const firstItem = this.items[0];
   const docNo = firstItem ? firstItem.docNo : null;
   const idCustomer = firstItem ? firstItem.idCustomer : null;
+  const tanggalKirim = firstItem ? firstItem.tanggalKirim : null;
+  const keterangan = firstItem ? firstItem.keterangan : null;
+ 
+  
+  // if (!docNo) {
+  //   alert("docNo tidak ditemukan!");
+  //   return;
+  // }
 
-  // Jika docNo atau idCustomer tidak ada, beri peringatan
-  if (!docNo) {
-    alert("docNo tidak ditemukan!");
-    return;
-  }
+  // if (!idCustomer) {
+  //   alert("idCustomer tidak ditemukan!");
+  //   return;
+  // }
 
-  if (!idCustomer) {
-    alert("idCustomer tidak ditemukan!");
-    return;
-  }
+  // if (!tanggalKirim) {
+  //   alert("tanggal kirim tidak ditemukan!");
+  //   return;
+  // }
 
   // Periksa apakah details adalah array
-  const materials = this.items.map(({ id, qtyPhysical }) => ({
-    idMaterial: id,
+  const details = this.items.map(({ id_detail, qtyPhysical }) => ({
+    idDetail: id_detail,
     qty: qtyPhysical,
   }));
 
-  // Pastikan bahwa materials tidak kosong
-  if (!materials.length) {
-    alert("Tidak ada material untuk diperbarui!");
-    return;
-  }
+  // // Pastikan bahwa details tidak kosong
+  // if (!details.length) {
+  //   alert("Tidak ada detail material untuk diperbarui!");
+  //   return;
+  // }
 
-  // Membuat payload dengan docNo dan idCustomer
+  // Membuat payload dengan format yang sesuai
   const payload = {
-    deliveryId: this.deliveryId,
-    docNo: docNo,  // Menambahkan docNo ke dalam payload
-    idCustomer: idCustomer,  // Menambahkan idCustomer ke dalam payload
-    materials: materials,
-    isStatus: 2,
+    docNo: docNo, // Menambahkan docNo ke dalam payload
+    tanggalKirim: tanggalKirim, // Pastikan tanggal kirim diambil dari state atau input
+    idCustomer: idCustomer, // Menambahkan idCustomer ke dalam payload
+    isStatus: 2, // Status pengiriman
+    updatedBy: this.dataUser.id, // User yang melakukan update, sesuaikan dengan state aplikasi
+    keterangan: keterangan, // Array detail material
+    details: details, // Array detail material
   };
 
-  // Log payload untuk memastikan docNo dan idCustomer ada di dalamnya
+  // Log payload untuk memastikan format sesuai
   console.log("Payload untuk update status:", payload);
 
   try {
+    this.$root.$emit("start-loading");
     const result = await this.$showConfirmationDialog();
     if (result.isConfirmed) {
-      this.$root.$emit("start-loading");
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Tambahkan penundaan 1 detik
       await api.put(`/api/delivery/${this.deliveryId}`, payload);
       this.$toast.fire({
         icon: "success",
         title: "Data berhasil diperbarui",
       });
-      this.resetForm();
+      this.resetForm(); // Reset form setelah update berhasil
     }
   } catch (error) {
     console.error("Error updating delivery status:", error);
@@ -177,6 +216,11 @@ async updateStatus() {
     this.$root.$emit("stop-loading");
   }
 },
+
+// formatDate(date) {
+//         return date ? new Date(date).toLocaleDateString('ID') : '-';
+//       },
+
 
 
 

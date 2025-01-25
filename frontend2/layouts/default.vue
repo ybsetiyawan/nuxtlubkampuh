@@ -128,22 +128,15 @@
       >
         <v-icon>mdi-application</v-icon>
       </v-btn>
-      <v-btn
+      <!-- <v-btn
         icon
         @click.stop="fixed = !fixed"
       >
         <v-icon>mdi-minus</v-icon>
-      </v-btn>
+      </v-btn> -->
       <v-toolbar-title> 
         <span style="color: #01579b;"> Selamat Datang kembali, {{ userData.nama }}</span></v-toolbar-title>
       <v-spacer />
-      <!-- <v-btn
-        icon
-        @click.stop="rightDrawer = !rightDrawer"
-      >
-        <v-icon>mdi-account</v-icon>
-        <v-icon>mdi-chevron-down</v-icon>
-      </v-btn> -->
 
       <!-- menu bar kanan -->
       <v-menu
@@ -154,19 +147,29 @@
       >
         <template v-slot:activator="{ attrs, on }">
           <div style="margin: auto;">
+            <v-tooltip bottom>
+              <template v-slot:activator="{ attrs, on }">
+                <v-btn icon @click="handleFullScreen()" v-bind="attrs" v-on="on">
+                  <v-icon medium color="blue">mdi-fullscreen</v-icon>
+                </v-btn>
+              </template>
+              <span>Fullscreen</span>
+            </v-tooltip>
             <v-btn dense depressed text v-bind="attrs" v-on="on">
-              <div class="mr-1">
+              <div>
                 <v-avatar size="30px">
                   <img :src="avatar"  /> &nbsp;
                 </v-avatar>
               </div>
               <v-spacer></v-spacer>
-              <v-icon>mdi-chevron-down</v-icon>
+              <v-icon small >mdi-chevron-down</v-icon>
             </v-btn>
           </div>
         </template>
+
         <v-list class="pa-0">
           <v-list-item
+            
             v-for="(item, index) in profileMenus"
             :to="!item.href ? { name: item.name } : null"
             @click="item.click"
@@ -175,6 +178,7 @@
             :target="item.target"
             rel="noopener"
             :key="index"
+            class="menu-item"
           >
             <v-list-item-action v-if="item.icon">
               <v-icon>{{ item.icon }}</v-icon>
@@ -193,7 +197,7 @@
       </v-container>
 
       <!-- Dialog Session Berakhir -->
-      <v-dialog v-model="sessionExpired" max-width="400">
+      <!-- <v-dialog v-model="sessionExpired" max-width="400">
         <v-card>
           <v-card-title class="text-h5">Session Expired</v-card-title>
           <v-divider></v-divider>
@@ -204,7 +208,7 @@
             <v-btn color="primary" text @click="handleSessionEnd">OK</v-btn>
           </v-card-actions>
         </v-card>
-      </v-dialog>
+      </v-dialog> -->
     </v-main>
     
     <v-footer
@@ -217,7 +221,9 @@
 </template>
 
 <script>
-import { mapGetters, mapState, mapActions} from 'vuex';
+import { mapGetters, mapState} from 'vuex';
+import Util from "~/utils";
+
 
 export default {
   middleware: 'auth',
@@ -226,7 +232,7 @@ export default {
       drawer: false,
       miniVariant: false,
       clipped: false,
-      fixed: false,
+      fixed: true,
       rightDrawer: false,
       right: false,
       userData: this.$cookies.get('user'), 
@@ -250,6 +256,7 @@ export default {
           click: this.handleLogout,
         },
       ],
+
     };
   },
   computed: {
@@ -269,6 +276,7 @@ export default {
     
   },
   mounted() {
+
     if (this.isAuthenticated) {
       this.fetchMenuItems(); // Panggil fetchMenuItems hanya jika sudah login
     }
@@ -321,6 +329,10 @@ export default {
       this.$router.push("/pengaturan/user/profile");
     },
 
+    handleFullScreen() {
+      Util.toggleFullScreen();
+    },
+
 
   },
 };
@@ -335,6 +347,15 @@ export default {
 
 .loading-bar {
   background-image: linear-gradient(to right, rgb(245, 7, 245), rgb(64, 245, 119));
+}
+
+.menu-item {
+  transition: background-color 0.3s, box-shadow 0.3s; /* Menambahkan transisi untuk efek hover */
+}
+
+.menu-item:hover {
+  background-color: rgba(0, 0, 0, 0.1); /* Efek hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Menambahkan bayangan saat hover */
 }
 </style>
 

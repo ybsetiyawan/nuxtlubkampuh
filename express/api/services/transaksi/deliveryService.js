@@ -10,12 +10,24 @@ class DeliveryService {
   async getAllDelivery() {
     // Mendapatkan semua data delivery
     const delivery = await DeliveryRepositories.getAllDelivery();
-    return delivery.map(formatDeliveryAll); // Format data jika diperlukan
+    if (!delivery) {
+      throw new Error("Delivery not found");
+    }
+    return delivery;
   }
 
   async getDeliveryById(id) {
     // Mendapatkan data delivery berdasarkan ID
     const delivery = await DeliveryRepositories.getDeliveryId(id);
+    if (!delivery) {
+      throw new Error("Delivery not found");
+    }
+    return delivery;
+  }
+
+  async getDeliveryByIdCustomer(id) {
+    // Mendapatkan data delivery berdasarkan ID
+    const delivery = await DeliveryRepositories.getDeliveryByIdCustomer(id);
     if (!delivery) {
       throw new Error("Delivery not found");
     }

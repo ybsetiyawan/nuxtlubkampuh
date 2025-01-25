@@ -149,131 +149,137 @@ export default {
       ],
       isFormActive: false,
       dataUser: this.$cookies.get('user'), 
+      // isLoading: true, // Tambahkan state loading
 
-    };
+
+    }
   },
   computed: {
-
       isSaveButtonEnabled() {
         return this.cart.length > 0;
       },
       isSearchButtonEnabled() {
         return this.tanggal;
       },
-      
-
+    //   isLoading() {
+    //   return this.$store.state.loading;
+    // },
   },
+  
   methods: {
-
-
-    startNewDelivery() {
-      this.tanggal = "";
-      this.keterangan = "";
-      this.cart = [];
-      this.isFormActive = true;
-    },
-    openSearchDialog() { 
-      this.searchMaterial();
-      this.dialog = true;
-    },
-    closeDialog() {
-      this.dialog = false;
-    },
-    async searchMaterial() {
-    
-    const response = await api.get('/api/material/all', );
-    const data = response.data.data.items;
-    this.materials = data;
-    console.log('material', this.materials)
-    },
-    isInCart(material) {
-      return this.cart.some((item) => item.id === material.id);
-    },
-    addToCart(material) {
-      if (!this.isInCart(material) && material.qtyInput > 0) {
-        this.cart.push({
-          id: material.id,
-          kode: material.kode,
-          nama: material.nama,
-          qty: material.qtyInput,
+        startNewDelivery() {
+          this.tanggal = "";
+          this.keterangan = "";
+          this.cart = [];
+          this.isFormActive = true;
+        },
+        openSearchDialog() { 
+          this.searchMaterial();
+          this.dialog = true;
+        },
+        closeDialog() {
+          this.dialog = false;
+        },
+        async searchMaterial() {
+        
+        const response = await api.get('/api/material/all', );
+        const data = response.data.data.items;
+        this.materials = data;
+        console.log('material', this.materials)
+        },
+        isInCart(material) {
+          return this.cart.some((item) => item.id === material.id);
+        },
+        addToCart(material) {
+          if (!this.isInCart(material) && material.qtyInput > 0) {
+            this.cart.push({
+              id: material.id,
+              kode: material.kode,
+              nama: material.nama,
+              qty: material.qtyInput,
+            });
+          }
+        },
+        removeFromCart(material) {
+          this.cart = this.cart.filter((item) => item.id !== material.id);
+          const index = this.materials.findIndex((m) => m.id === material.id);
+          if (index !== -1) {
+            this.materials[index].qtyInput = null;
+          }
+        },
+        resetForm() {
+        // Mengosongkan semua inputan dan keranjang material
+        this.tanggal = "";
+        this.keterangan = "";
+        this.cart = [];
+        this.materials.forEach((material) => {
+          material.qtyInput = null; // Reset qty input jika ada
         });
-      }
-    },
-    removeFromCart(material) {
-      this.cart = this.cart.filter((item) => item.id !== material.id);
-      const index = this.materials.findIndex((m) => m.id === material.id);
-      if (index !== -1) {
-        this.materials[index].qtyInput = null;
-      }
-    },
-    resetForm() {
-    // Mengosongkan semua inputan dan keranjang material
-    this.tanggal = "";
-    this.keterangan = "";
-    this.cart = [];
-    this.materials.forEach((material) => {
-      material.qtyInput = null; // Reset qty input jika ada
-    });
-    this.isFormActive = false
-  },
-  async saveTransaction() {
-    // Validasi input
-    if (!this.tanggal) {
-      alert("Tanggal kirim harus diisi!");
-      return;
-    }
-    if (!this.keterangan) {
-      alert("Keterangan harus diisi!");
-      return;
-    }
-    if (this.cart.length === 0) {
-      alert("Keranjang material tidak boleh kosong!");
-      return;
-    }
-
-    // Data yang akan dikirim ke backend
-    const transactionData = {
-      delivery: {
-        docNo: '123456', // Format docNo dinamis
-        tanggalKirim: this.tanggal,
-        idCustomer: this.dataUser.idCustomer,
-        keterangan: this.keterangan,
-        isStatus: "1", // Sesuaikan dengan status yang diinginkan
-        createdBy: this.dataUser.id,
+        this.isFormActive = false
       },
-      details: this.cart.map((item) => ({
-        idMaterial: item.id,
-        qty: item.qty,
-        })),
-    };
+      async saveTransaction() {
+        // Validasi input
+        if (!this.tanggal) {
+          alert("Tanggal kirim harus diisi!");
+          return;
+        }
+        if (!this.keterangan) {
+          alert("Keterangan harus diisi!");
+          return;
+        }
+        if (this.cart.length === 0) {
+          alert("Keranjang material tidak boleh kosong!");
+          return;
+        }
 
-    this.$root.$emit('start-loading'); // Tampilkan garis loading
+        // Data yang akan dikirim ke backend
+        const transactionData = {
+          delivery: {
+            docNo: '123456', // Format docNo dinamis
+            tanggalKirim: this.tanggal,
+            idCustomer: this.dataUser.idCustomer,
+            keterangan: this.keterangan,
+            isStatus: "1", // Sesuaikan dengan status yang diinginkan
+            createdBy: this.dataUser.id,
+          },
+          details: this.cart.map((item) => ({
+            idMaterial: item.id,
+            qty: item.qty,
+            })),
+        };
 
-    try {
-      // Simpan transaksi ke backend
-      const result = await this.$showConfirmationDialog();
-        if(result.isConfirmed) {
+
+        try {
+          // Simpan transaksi ke backend
           this.$root.$emit("start-loading"); // Mulai loading
-          await new Promise((resolve) => setTimeout(resolve, 1000)); // Tambahkan penundaan 1 detik
-          await api.post('/api/delivery', transactionData);
-          this.resetForm();
-      }
-      this.$toast.fire({
-            icon: 'success',
-            title: 'Data berhasil disimpan',
-          });
-      } catch (error) {
-        console.error('Error saving transaction:', error);
-        // alert("Gagal menyimpan transaksi. Silakan coba lagi.");
-        this.$toast.fire({
-        icon: 'error',
-        title: error.response?.data?.message ,
-          });
-      } finally {
-      this.$root.$emit('stop-loading'); // Tampilkan garis loading
-      }
-    }
-  },
+          const result = await this.$showConfirmationDialog();
+            if(result.isConfirmed) {
+              await new Promise((resolve) => setTimeout(resolve, 1000)); // Tambahkan penundaan 1 detik
+              await api.post('/api/delivery', transactionData);
+              this.$toast.fire({
+                icon: 'success',
+                title: 'Data berhasil disimpan',
+              });
+              this.resetForm();
+          }
+          } catch (error) {
+            console.error('Error saving transaction:', error);
+            // alert("Gagal menyimpan transaksi. Silakan coba lagi.");
+            this.$toast.fire({
+            icon: 'error',
+            title: error.response?.data?.message ,
+              });
+          } finally {
+          this.$root.$emit('stop-loading'); // Tampilkan garis loading
+          }
+        }
+      },
+
+  mounted() {
+    setTimeout(() => {
+      this.isLoading = false; // Hentikan loading setelah 1 detik
+    }, 1000); // Ubah durasi sesuai kebutuhan
+  }
 };
 </script>
 
@@ -345,6 +351,7 @@ export default {
   .new-button:hover:enabled {
     background-color: rgb(32, 158, 93);
   }
+  
 
  
   
