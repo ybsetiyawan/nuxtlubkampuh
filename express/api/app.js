@@ -4,6 +4,7 @@ const express = require("express");
 const employeeRoutes = require("./routes/master/employeeRoutes");
 const customerRoutes = require("./routes/master/customerRoutes");
 const materialRoutes = require("./routes/master/materialRoutes");
+const companyRoutes = require("./routes/master/companyRoutes");
 
 // SETTING
 const userRoutes = require("./routes/setting/userRoutes");
@@ -12,7 +13,7 @@ const menuRoutes = require("./routes/setting/menuRoutes");
 const menuUserRoutes = require("./routes/setting/menuUserRoutes");
 
 // TRANSAKSI
-const DeliveryRoutes = require("./routes/transaksi/deliveryRoutes");
+const deliveryRoutes = require("./routes/transaksi/deliveryRoutes");
 
 
 const cors = require("cors");
@@ -48,6 +49,7 @@ app.use("/api/menu", menuRoutes);
 app.use("/api/menu-user", menuUserRoutes);
 app.use("/api/customer", customerRoutes);
 app.use("/api/material", materialRoutes);
-app.use("/api/delivery", DeliveryRoutes);
+app.use("/api/delivery", deliveryRoutes);
+app.use("/api/company", companyRoutes);
 
 module.exports = app;

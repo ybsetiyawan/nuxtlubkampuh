@@ -69,7 +69,7 @@
                     </v-col>
                     <v-col>
                       <span style="display: flex; align-items: center; justify-content: flex-end;">
-                        <v-icon :color="getStatusIconColor(delivery.is_status)" x-small>mdi-circle-multiple</v-icon>
+                        <v-icon :color="getStatusIconColor(delivery.is_status)" small>mdi-circle-multiple</v-icon>
                         <span style="margin-left: 12px;">{{ getStatusText(delivery.is_status) }}</span>
                       </span>
                     </v-col>

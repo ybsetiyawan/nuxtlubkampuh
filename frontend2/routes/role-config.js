@@ -13,6 +13,7 @@ export default {
 
     '/transaksi/delivery': ['HA02'],  
     '/transaksi/afterdelivery': ['HA01'],
+    '/transaksi/statuspengiriman': ['HA01', 'HA02'],
 
   };
   
