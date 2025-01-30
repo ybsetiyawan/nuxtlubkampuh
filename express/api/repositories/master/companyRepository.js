@@ -16,7 +16,7 @@ class CompanyRepository {
     }
 
     let query = `
-        SELECT id, nama, alamat, no_telp, email, npwp, bank, bank_no, bank_an, created_at, created_by, updated_at, updated_by, is_deleted
+        SELECT id, nama, alamat, no_telp, email, website, bank, bank_no, bank_an, created_at, created_by, updated_at, updated_by, is_deleted
         FROM public.m_company
         WHERE is_deleted = false
     `;
@@ -65,7 +65,7 @@ class CompanyRepository {
   async getCompanyById(id) {
     const res = await pool.query(
       `
-      SELECT id, nama, alamat, no_telp, email, npwp, bank, bank_no, bank_an, created_at, created_by, updated_at, updated_by, is_deleted
+      SELECT id, nama, alamat, no_telp, email, website, bank, bank_no, bank_an, created_at, created_by, updated_at, updated_by, is_deleted
       FROM public.m_company
       WHERE id = $1
     `,
@@ -79,7 +79,7 @@ class CompanyRepository {
     const id = uuidv4();
 
     const res = await pool.query(
-      `INSERT INTO m_company (id, nama, alamat, no_telp, email, npwp, bank, bank_no, bank_an)
+      `INSERT INTO m_company (id, nama, alamat, no_telp, email, website, bank, bank_no, bank_an)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         RETURNING *`,
       [
@@ -88,7 +88,7 @@ class CompanyRepository {
         company.alamat,
         company.noTelp,
         company.email,
-        company.npwp,
+        company.website,
         company.bank,
         company.bankNo,
         company.bankAn,
@@ -99,13 +99,14 @@ class CompanyRepository {
   async updateCompany(id, company) {
     const res = await pool.query(
       `UPDATE m_company
-        SET nama = $1, alamat = $2, no_telp = $3, email = $4, npwp = $5, bank = $6, bank_no = $7, bank_an = $8, updated_at = NOW()
+        SET nama = $1, alamat = $2, no_telp = $3, email = $4, website = $5, bank = $6, bank_no = $7, bank_an = $8, updated_at = NOW()
         WHERE id = $9 RETURNING *`,
       [
         company.nama,
         company.alamat,
         company.noTelp,
         company.email,
+        company.website,
         company.bank,
         company.bankNo,
         company.bankAn,

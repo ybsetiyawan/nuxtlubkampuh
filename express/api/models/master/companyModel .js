@@ -4,7 +4,7 @@ const formatCompany = (company) => ({
   alamat: company.alamat,
   noTelp: company.no_telp,
   email: company.email,
-  npwp: company.npwp,
+  website: company.website,
   bank: company.bank,
   bankNo: company.bank_no,
   bankAn: company.bank_an,

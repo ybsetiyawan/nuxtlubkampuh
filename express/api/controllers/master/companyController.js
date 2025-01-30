@@ -26,7 +26,7 @@ class CompanyController {
             alamat: item.alamat,
             noTelp: item.no_telp || null,
             email: item.email || null,
-            npwp: item.npwp || null,
+            website: item.website || null,
             bank: item.bank || null,
             bankNo: item.bank_no || null,
             bankAn: item.bank_an || null,
@@ -71,13 +71,13 @@ class CompanyController {
 
   async createCompany(req, res) {
     try {
-      const { nama, alamat, noTelp, email, npwp, bank, bankNo, bankAn } = req.body;
+      const { nama, alamat, noTelp, email, website, bank, bankNo, bankAn } = req.body;
       const newCompany = await CompanyService.createCompany({
         nama,
         alamat,
         noTelp,
         email,
-        npwp,
+        website,
         bank,
         bankNo,
         bankAn,
