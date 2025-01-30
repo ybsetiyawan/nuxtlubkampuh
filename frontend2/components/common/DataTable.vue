@@ -53,7 +53,7 @@
               <span>Refresh data</span>
             </v-tooltip>
 
-            <v-tooltip bottom>
+            <v-tooltip bottom v-if="showAddButton">
               <template v-slot:activator="{ on }">
                 <v-btn
                   icon
@@ -123,6 +123,10 @@
       defaultSortType: {
       type: String,
       default: 'ASC'
+      },
+      showAddButton: {
+        type: Boolean,
+        default: true
       }
     },
     data() {

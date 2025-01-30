@@ -21,7 +21,6 @@
                   :required="field.required"
                   outlined
                   dense
-
                 ></v-text-field>
   
                 <!-- Text Area -->
@@ -33,7 +32,6 @@
                   :required="field.required"
                   outlined
                   dense
-
                 ></v-textarea>
   
                 <!-- Select -->
@@ -163,3 +161,4 @@
     }
   }
   </script>
+

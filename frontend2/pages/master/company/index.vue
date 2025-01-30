@@ -13,6 +13,7 @@
         default-sort-type="ASC"
         @add-item="openAddDialog"
         @edit-item="handleEditItem"
+        :show-add-button="false"
       />
       <v-form ref="form">
       <form-dialog
@@ -59,11 +60,11 @@
         items: [],
         headers: [
           { text: 'No', value: 'no', width: '68px', sortable: false },
-          { text: 'nama', value: 'nama', sortable: false },
+          { text: 'Nama', value: 'nama', sortable: false },
           { text: 'Alamat', value: 'alamat', sortable: false },
           { text: 'No Telp', value: 'noTelp', sortable: false },
           { text: 'Email', value: 'email', sortable: false },
-          { text: 'website', value: 'website', sortable: false },
+          { text: 'Website', value: 'website', sortable: false },
           { text: 'Bank', value: 'bank', sortable: false },
           { text: 'Bank No', value: 'bankNo', sortable: false },
           { text: 'Bank A/n', value: 'bankAn', sortable: false },
@@ -270,3 +271,4 @@
   };
   </script>
   
+
