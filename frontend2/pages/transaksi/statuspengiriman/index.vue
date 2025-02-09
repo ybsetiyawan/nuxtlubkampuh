@@ -19,10 +19,10 @@
           <v-icon left>mdi-magnify</v-icon>Cari
         </v-btn>
         <v-btn 
-          :disabled="!searched"
-          text color="error" @click="resetForm">
-          <v-icon left>mdi-refresh</v-icon>Reset
-        </v-btn>
+        :disabled="!searched"
+        text color="error" @click="resetForm">
+        <v-icon left>mdi-refresh</v-icon>Reset
+      </v-btn>
         </v-card-title>
         <v-divider></v-divider>
   
@@ -49,7 +49,22 @@
               <v-card class="mb-2 card-with-icon-background" outlined hover @click="toggleDetails(delivery.id)">
                 <v-card-title>
                    {{ delivery.nama_customer }}
-                  <v-spacer></v-spacer>
+                   <v-spacer></v-spacer>
+                   <v-btn
+                   style="margin-right: 20px;"
+                     x-small
+                     @click="printData(delivery.id)"
+                   >
+                     <v-icon small>mdi-printer-eye</v-icon>
+                   </v-btn>
+                   <!-- <v-btn
+                   style="margin-right: 20px;"
+                     x-small
+                     @click="printData(delivery.id)"
+                     :disabled="delivery.is_status !== '1'"
+                   >
+                     <v-icon small>mdi-printer-eye</v-icon>
+                   </v-btn> -->
                   <v-icon>{{ expandedDeliveryId === delivery.id ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
                 </v-card-title>
                 <v-card-subtitle>
@@ -69,6 +84,8 @@
                     </v-col>
                     <v-col>
                       <span style="display: flex; align-items: center; justify-content: flex-end;">
+                        
+                        <span style="margin-left: 12px;"></span>
                         <v-icon :color="getStatusIconColor(delivery.is_status)" small>mdi-circle-multiple</v-icon>
                         <span style="margin-left: 12px;">{{ getStatusText(delivery.is_status) }}</span>
                       </span>
@@ -116,7 +133,7 @@
   export default {
     data() {
       return {
-      deliveryId: "",
+        deliveryId: "",
         deliveries: [],
         originalDeliveries: [], // Salinan data asli
         searched: false,
@@ -124,6 +141,7 @@
         dataUser: this.$cookies.get('user'), 
         currentPage: 1,
         pageSize: 4,
+        selectedDeliveryId: null
       };
     },
 
@@ -139,7 +157,6 @@
     },
   },
     methods: {
-    
         async fetchDeliveriesByCustomer(customerId) {
             try {
                 this.$root.$emit("start-loading");
@@ -183,6 +200,37 @@
         this.searched = true;
 
     },
+
+    async printData(deliveryId) {
+        if (!deliveryId) {
+            alert('Tidak ada data yang dipilih');
+            return;
+        }
+
+        try {
+            this.$root.$emit("start-loading");
+            const response = await api.get(`/api/report/generate?id=${deliveryId}`, {
+                responseType: 'blob' // Pastikan respons diterima sebagai blob
+            });
+            // console.log(response);
+
+            // Buat URL dari blob dan unduh file
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const a = document.createElement('a');
+            a.href = url;
+            a.setAttribute('download', `laporan_${deliveryId}.pdf`); // Nama file yang akan diunduh
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Gagal mengambil laporan:', error);
+            // Tampilkan pesan kesalahan kepada pengguna
+        } finally {
+            this.$root.$emit("stop-loading");
+        }
+    },
+
+   
     resetForm() {
       this.deliveries = [...this.originalDeliveries]; // Kembalikan data ke aslinya
       this.currentPage = 1; // Reset ke halaman pertama
@@ -197,6 +245,9 @@
     },
       toggleDetails(id) {
         this.expandedDeliveryId = this.expandedDeliveryId === id ? null : id;
+        if (this.expandedDeliveryId) {
+            this.selectedDeliveryId = id; // Set the selectedDeliveryId only when a card is expanded
+        }
       },
     //   formatDate(date) {
     //     return date ? new Date(date).toLocaleDateString('ID') : '-';
